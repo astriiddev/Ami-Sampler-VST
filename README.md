@@ -81,3 +81,4 @@ If there are any features you would like me to add, feel free to recommend them!
 3) 8bitbubsy's Protracker and Fasttracker II clones https://github.com/8bitbubsy/pt2-clone https://github.com/8bitbubsy/ft2-clone 
 4) WinUAE, to help with designing the graphics without having to boot up my amiga https://www.winuae.net/
 5) off1k youtube channel, the best channel for amiga demoscene playlists, an ongoing inspiration to me https://www.youtube.com/@off1k
+6) Amiga ST-XX Sample library https://archive.org/details/AmigaSTXX
