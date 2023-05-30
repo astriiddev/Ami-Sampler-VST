@@ -154,7 +154,7 @@ bool WaveThumbnail::isInterestedInFileDrag(const juce::StringArray& files)
     //!!!! TODO: include 8SVX formatted .IFF files in allowed file types !!!!//
     for (auto file : files)
     {
-        if (file.contains(".wav") || file.contains(".mp3") || file.contains(".aif") || file.contains(".raw"))
+        if (file.contains(".wav") || file.contains(".mp3") || file.contains(".aif") || file.contains(".raw") ||  file.contains(".smp"))
         {
             return true;
         }
