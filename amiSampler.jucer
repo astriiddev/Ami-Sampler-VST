@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="qw31oj" name="Ami Sampler" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
+              defines="JUCE_MODAL_LOOPS_PERMITTED=1&#10;&#10;" pluginManufacturer="_astriid_"
+              pluginName="Ami Sampler" pluginDesc="Tracker-era inspired sampler"
+              cppLanguageStandard="latest" displaySplashScreen="1" splashScreenColour="Light"
+              pluginFormats="buildStandalone,buildVST3">
+  <MAINGROUP id="LaMq1U" name="Ami Sampler">
+    <GROUP id="{AC83E5EC-ED80-021A-9A1C-065954D8046E}" name="Source">
+      <GROUP id="{9B92ABD7-9422-A7B4-FBE5-EC470A0776E2}" name="Ami Icons">
+        <FILE id="CZYUxL" name="AmiMED Icon.png" compile="0" resource="1" file="../../../../Pictures/AmiMED Icon.png"/>
+        <FILE id="HK1jH0" name="amiTrashOff.png" compile="0" resource="1" file="../../../../Pictures/amiTrashOff.png"/>
+        <FILE id="YrCja6" name="amiTrashOn.png" compile="0" resource="1" file="../../../../Pictures/amiTrashOn.png"/>
+        <FILE id="qdHPjN" name="amiBoxBacking.png" compile="0" resource="1"
+              file="../../../../Pictures/amiBoxBacking.png"/>
+        <FILE id="P5dqEr" name="astriid_amiga.png" compile="0" resource="1"
+              file="../../../../Pictures/astriid_amiga.png"/>
+        <FILE id="YkS9MI" name="amiSaveOff.png" compile="0" resource="1" file="../../../../Pictures/amiSaveOff.png"/>
+        <FILE id="uNTeE2" name="amiSaveOn.png" compile="0" resource="1" file="../../../../Pictures/amiSaveOn.png"/>
+        <FILE id="iyDbHU" name="amiMouseCursor.png" compile="0" resource="1"
+              file="../../../../Pictures/amiMouseCursor.png"/>
+        <FILE id="Gn9xzi" name="amiLoadOff.png" compile="0" resource="1" file="../../../../Pictures/amiLoadOff.png"/>
+        <FILE id="cHiMMw" name="amiLoadOn.png" compile="0" resource="1" file="../../../../Pictures/amiLoadOn.png"/>
+        <FILE id="mxOYIb" name="amiLoopOff.png" compile="0" resource="1" file="../../../../Pictures/amiLoopOff.png"/>
+        <FILE id="UUn9sS" name="amiLoopOn.png" compile="0" resource="1" file="../../../../Pictures/amiLoopOn.png"/>
+        <FILE id="vV11lD" name="amiClearOff.png" compile="0" resource="1" file="../../../../Pictures/amiClearOff.png"/>
+        <FILE id="Dsw4Np" name="amiClearOn.png" compile="0" resource="1" file="../../../../Pictures/amiClearOn.png"/>
+      </GROUP>
+      <FILE id="FBUT7i" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="hnOIK0" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+      <FILE id="fNGltR" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="ody5M9" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="Oh1V0F" name="WaveThumbnail.cpp" compile="1" resource="0"
+            file="Source/WaveThumbnail.cpp"/>
+      <FILE id="HH4If1" name="WaveThumbnail.h" compile="0" resource="0" file="Source/WaveThumbnail.h"/>
+      <FILE id="rVGE20" name="ADSRComponent.cpp" compile="1" resource="0"
+            file="Source/ADSRComponent.cpp"/>
+      <FILE id="WhPH6h" name="ADSRComponent.h" compile="0" resource="0" file="Source/ADSRComponent.h"/>
+      <FILE id="zGAKre" name="ControlComponent.cpp" compile="1" resource="0"
+            file="Source/ControlComponent.cpp"/>
+      <FILE id="uxsKkq" name="ControlComponent.h" compile="0" resource="0"
+            file="Source/ControlComponent.h"/>
+      <FILE id="IgYhvX" name="LoopSliderLnF.cpp" compile="1" resource="0"
+            file="Source/LoopSliderLnF.cpp"/>
+      <FILE id="wSZ0Ac" name="LoopSliderLnF.h" compile="0" resource="0" file="Source/LoopSliderLnF.h"/>
+      <FILE id="xyBNiF" name="OtherLookAndFeel.cpp" compile="1" resource="0"
+            file="Source/OtherLookAndFeel.cpp"/>
+      <FILE id="NNRd5u" name="OtherLookAndFeel.h" compile="0" resource="0"
+            file="Source/OtherLookAndFeel.h"/>
+      <FILE id="rR34FA" name="NewSamplerVoice.cpp" compile="1" resource="0"
+            file="Source/NewSamplerVoice.cpp"/>
+      <FILE id="ab02Qt" name="NewSamplerVoice.h" compile="0" resource="0"
+            file="Source/NewSamplerVoice.h"/>
+      <FILE id="FwDSe1" name="WaveWindow.cpp" compile="1" resource="0" file="Source/WaveWindow.cpp"/>
+      <FILE id="QLOwAb" name="WaveWindow.h" compile="0" resource="0" file="Source/WaveWindow.h"/>
+    </GROUP>
+  </MAINGROUP>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
+  <EXPORTFORMATS>
+    <VS2022 targetFolder="Builds/VisualStudio2022" bigIcon="CZYUxL">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Ami Sampler"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Ami Sampler" optimisation="4"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../../../Program Files/JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2022>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+</JUCERPROJECT>
