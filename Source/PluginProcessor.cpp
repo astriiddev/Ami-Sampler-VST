@@ -252,7 +252,8 @@ void AmiSamplerAudioProcessor::buttonLoadFile()
         auto file = chooser.getResult();
         /* Only loads file if valid file type */
         if (file.getFileName().contains(".wav") || file.getFileName().contains(".mp3") || 
-            file.getFileName().contains(".aif") || file.getFileName().contains(".raw"))
+            file.getFileName().contains(".aif") || file.getFileName().contains(".raw") ||
+            file.getFileName().contains(".smp"))
 
             loadFile(file.getFullPathName());
 
