@@ -34,6 +34,8 @@ public:
     LoopSliderLnF(AmiSamplerAudioProcessor& p);
     ~LoopSliderLnF() override;
 
+    //juce::MouseCursor getMouseCursorFor(juce::Component&) override;
+
     /* Sets slider thumb area */
     int getSliderThumbRadius(juce::Slider& slider) override;
 

@@ -22,22 +22,15 @@
 */
 
 //==============================================================================
-WaveThumbnail::WaveThumbnail(AmiSamplerAudioProcessor& p) : mCursor(p), audioProcessor(p)
+WaveThumbnail::WaveThumbnail(AmiSamplerAudioProcessor& p) : audioProcessor(p)
 {
-    /* Custom mouse cursor initialization */
-    ////!!!! TODO: figure out why this component isn't inheriting parent mouse cursor !!!!//
-    auto mouseCursor = juce::ImageCache::getFromMemory(BinaryData::amiMouseCursor_png, BinaryData::amiMouseCursor_pngSize);
-    
-    setMouseCursor(juce::MouseCursor(mouseCursor.rescaled(mouseCursor.getBounds().getWidth() * 4, 
-                   mouseCursor.getBounds().getHeight() * 4, juce::Graphics::lowResamplingQuality), 0, 0));
-
     /* Two value sliders used for start and end loop points */
+    setMouseCursor(getTopLevelComponent()->getMouseCursor());
     mLoopPoints.setSliderStyle(juce::Slider::SliderStyle::TwoValueHorizontal);
     mLoopPoints.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
     mLoopPoints.setRange(0.0f, 1.0f, 0.0000001f);
-    mLoopPoints.setLookAndFeel(&mCursor);
+   // mLoopPoints.setLookAndFeel(&mCursor);
     mLoopPoints.addListener(this);
-    mLoopPoints.setMouseCursor(getMouseCursor().ParentCursor);
 
     /* Slider intialiaztion and mouse listener for mouse dragging */
     setWantsKeyboardFocus(false);
@@ -48,7 +41,7 @@ WaveThumbnail::WaveThumbnail(AmiSamplerAudioProcessor& p) : mCursor(p), audioPro
 WaveThumbnail::~WaveThumbnail()
 {
     /* Slider dereferencing */
-    mLoopPoints.setLookAndFeel(nullptr);
+    //mLoopPoints.setLookAndFeel(nullptr);
     mLoopPoints.removeListener(this);
 }
 
@@ -154,7 +147,7 @@ bool WaveThumbnail::isInterestedInFileDrag(const juce::StringArray& files)
     //!!!! TODO: include 8SVX formatted .IFF files in allowed file types !!!!//
     for (auto file : files)
     {
-        if (file.contains(".wav") || file.contains(".mp3") || file.contains(".aif") || file.contains(".raw"))
+        if (file.contains(".wav") || file.contains(".mp3") || file.contains(".aif") || file.contains(".raw") || file.contains(".smp"))
         {
             return true;
         }
@@ -208,6 +201,7 @@ bool WaveThumbnail::hitTest(int x, int y)
        This stops the slider from snapping to all mouse clicks, creates a small windowed
        area around slider positions so that sliders only move when the mouse is down on 
        or directly near the slider positions */
+    mLoopPoints.setMouseCursor(juce::MouseCursor::ParentCursor);
     mOnLoopPoint = false;
     const int loopWindow = proportionOfWidth(0.0015f);
 

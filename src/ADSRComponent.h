@@ -12,7 +12,6 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-#include "OtherLookAndFeel.h"
 
 /*
   ==============================================================================
@@ -50,9 +49,6 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mDecayAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mSustainAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mReleaseAttachment;
-
-    /* Custom slider graphics */
-    OtherLookAndFeel mLookAndFeel;
 
     AmiSamplerAudioProcessor& audioProcessor;
 

@@ -23,11 +23,8 @@
 AmiSamplerAudioProcessorEditor::AmiSamplerAudioProcessorEditor (AmiSamplerAudioProcessor& p)
     : AudioProcessorEditor (&p), mLookAndFeel(p), mAmiWindow(p), mWaveThumbnail(p), mControl(p), audioProcessor(p)
 {
-    /* Custom mouse cursor */
-    auto mouseCursor = juce::ImageCache::getFromMemory(BinaryData::amiMouseCursor_png, BinaryData::amiMouseCursor_pngSize);
-    
-    setMouseCursor(juce::MouseCursor(mouseCursor.rescaled(mouseCursor.getBounds().getWidth() * 4, 
-                   mouseCursor.getBounds().getHeight() * 4, juce::Graphics::lowResamplingQuality), 0, 0));
+    /* Custom global graphics */
+    juce::LookAndFeel::setDefaultLookAndFeel(&mLookAndFeel);
 
     /* GUI component initialization */
     addAndMakeVisible(mControl);
@@ -45,12 +42,9 @@ AmiSamplerAudioProcessorEditor::AmiSamplerAudioProcessorEditor (AmiSamplerAudioP
     mViewWave.setInterceptsMouseClicks(false, true);
     mViewWave.setViewedComponent(&mWaveThumbnail, false);
     mViewWave.setViewedComponent(&mWaveThumbnail, false);
-    mViewWave.setMouseCursor(getMouseCursor().ParentCursor);
-
+    
     /* Custom graphics for zoom scrollbar */
     mViewWave.getHorizontalScrollBar().setColour(juce::ScrollBar::ColourIds::thumbColourId,juce::Colours::white);
-    mViewWave.getHorizontalScrollBar().setLookAndFeel(&mLookAndFeel);
-    mViewWave.getHorizontalScrollBar().setMouseCursor(getMouseCursor().ParentCursor);
 
     /* Sets initial window bounds and rescaling bounds */
     setResizable(true, false);
@@ -64,7 +58,8 @@ AmiSamplerAudioProcessorEditor::AmiSamplerAudioProcessorEditor (AmiSamplerAudioP
 AmiSamplerAudioProcessorEditor::~AmiSamplerAudioProcessorEditor()
 {
     /* Dereferences scrollbar graphics */
-    mViewWave.getHorizontalScrollBar().setLookAndFeel(nullptr);
+
+    juce::LookAndFeel::setDefaultLookAndFeel(nullptr);
 }
 
 //==============================================================================

@@ -12,7 +12,6 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-#include "LoopSliderLnF.h"
 
 /*
   ==============================================================================
@@ -69,7 +68,6 @@ private:
       shared with drawLinearSlider function to need fewer files, but giving loop point sliders //
       their own drawLinearSlider makes it easier to edit their graphics on the fly quicker ????*/
     juce::Slider mLoopPoints;
-    LoopSliderLnF mCursor;
 
     float mCentreWave = 0.5f;
     float mScaleFactor = 1.0f;

@@ -22,15 +22,13 @@
 */
 
 //==============================================================================
-ADSRComponent::ADSRComponent(AmiSamplerAudioProcessor&p) : 
-    mLookAndFeel(p), audioProcessor(p)
+ADSRComponent::ADSRComponent(AmiSamplerAudioProcessor&p) : audioProcessor(p)
 {
     /* Slider initialization // most of this implemented from The Audio Programmer's sampler tutorial */
 
     //Volume Slider
     mVolSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
     mVolSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    mVolSlider.setLookAndFeel(&mLookAndFeel);
     mVolSlider.setMouseCursor(getMouseCursor().ParentCursor);
     addAndMakeVisible(mVolSlider);
     
@@ -48,7 +46,6 @@ ADSRComponent::ADSRComponent(AmiSamplerAudioProcessor&p) :
     //Pan Slider
     mPanSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
     mPanSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    mPanSlider.setLookAndFeel(&mLookAndFeel);
     mPanSlider.setMouseCursor(getMouseCursor().ParentCursor);
     addAndMakeVisible(mPanSlider);
 
@@ -63,7 +60,6 @@ ADSRComponent::ADSRComponent(AmiSamplerAudioProcessor&p) :
     //Attack Slider
     mAttackSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
     mAttackSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    mAttackSlider.setLookAndFeel(&mLookAndFeel);
     mAttackSlider.setMouseCursor(getMouseCursor().ParentCursor);
     addAndMakeVisible(mAttackSlider);
 
@@ -78,7 +74,6 @@ ADSRComponent::ADSRComponent(AmiSamplerAudioProcessor&p) :
     //Decay Slider
     mDecaySlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
     mDecaySlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    mDecaySlider.setLookAndFeel(&mLookAndFeel);
     mDecaySlider.setMouseCursor(getMouseCursor().ParentCursor);
     addAndMakeVisible(mDecaySlider);
 
@@ -93,7 +88,6 @@ ADSRComponent::ADSRComponent(AmiSamplerAudioProcessor&p) :
     //Sustain Slider
     mSustainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
     mSustainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    mSustainSlider.setLookAndFeel(&mLookAndFeel);
     mSustainSlider.setRange(0.0f, 1.0f, 0.33f);
     mSustainSlider.setValue(1.0f);
     mSustainSlider.setMouseCursor(getMouseCursor().ParentCursor);
@@ -110,7 +104,6 @@ ADSRComponent::ADSRComponent(AmiSamplerAudioProcessor&p) :
     //Release Slider
     mReleaseSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
     mReleaseSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    mReleaseSlider.setLookAndFeel(&mLookAndFeel);
     mReleaseSlider.setMouseCursor(getMouseCursor().ParentCursor);
     addAndMakeVisible(mReleaseSlider);
 
@@ -126,20 +119,13 @@ ADSRComponent::ADSRComponent(AmiSamplerAudioProcessor&p) :
 
 ADSRComponent::~ADSRComponent()
 {
-    /* Slider graphics dereferencing */
-    mVolSlider.setLookAndFeel(nullptr);
-    mPanSlider.setLookAndFeel(nullptr);
-    mAttackSlider.setLookAndFeel(nullptr);
-    mDecaySlider.setLookAndFeel(nullptr);
-    mSustainSlider.setLookAndFeel(nullptr);
-    mSustainSlider.setLookAndFeel(nullptr);
-    mReleaseSlider.setLookAndFeel(nullptr);
 }
 
 void ADSRComponent::paint (juce::Graphics& g)
 {
     /* Slider label font */
-    juce::Font theFont("AmiDOS Regular", "Regular", getWidth() / 13.0f);
+    auto theFont = g.getCurrentFont();
+    theFont.setHeight( getWidth() / 13.0f);
     mVolLabel.setFont(theFont);
     mPanLabel.setFont(theFont);
     mAttackLabel.setFont(theFont);

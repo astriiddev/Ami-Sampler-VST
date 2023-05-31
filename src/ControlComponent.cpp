@@ -30,42 +30,37 @@ ControlComponent::ControlComponent(AmiSamplerAudioProcessor& p) :
     keyboardComponent(p.getKeyState(), juce::MidiKeyboardComponent::horizontalKeyboard), 
     mADSR(p), audioProcessor(p)
 {
-    /* Adding all of the controls and passing the custom cursor to each of them */
-
-    setMouseCursor(getMouseCursor().ParentCursor);
+    /* GUI control initialization */
 
     addAndMakeVisible(mLogoImage);
     addAndMakeVisible(mADSR);
 
-    mLogoImage.setMouseCursor(getMouseCursor().ParentCursor);
-    mADSR.setMouseCursor(getMouseCursor().ParentCursor);
-
-    addAndMakeVisible(mBoxBacking);
+    addAndMakeVisible(mSampleBacking);
     addAndMakeVisible(mStartBacking);
     addAndMakeVisible(mEndBacking);
-
-    mBoxBacking.setMouseCursor(getMouseCursor().ParentCursor);
-    mStartBacking.setMouseCursor(getMouseCursor().ParentCursor);
-    mEndBacking.setMouseCursor(getMouseCursor().ParentCursor);
 
     addAndMakeVisible(startLoopText);
     addAndMakeVisible(endLoopText);
     addAndMakeVisible(mEnableLoop);
 
-    startLoopText.setMouseCursor(getMouseCursor().ParentCursor);
-    endLoopText.setMouseCursor(getMouseCursor().ParentCursor);
-    mEnableLoop.setMouseCursor(getMouseCursor().ParentCursor);
-
     addAndMakeVisible(mLoadSample);
     addAndMakeVisible(mClearSample);
     addAndMakeVisible(mSaveSample);
 
-    mLoadSample.setMouseCursor(getMouseCursor().ParentCursor);
-    mClearSample.setMouseCursor(getMouseCursor().ParentCursor);
-    mSaveSample.setMouseCursor(getMouseCursor().ParentCursor);
-
     addAndMakeVisible(keyboardComponent);
-    keyboardComponent.setMouseCursor(getMouseCursor().ParentCursor);
+
+    /* Grey colour for all the text label backings*/
+    auto boxColour = juce::Colour(0xff9e9e9e);
+
+    mSampleBacking.setColour(juce::TextButton::buttonColourId, boxColour);
+    mStartBacking.setColour(juce::TextButton::buttonColourId, boxColour);
+    mEndBacking.setColour(juce::TextButton::buttonColourId, boxColour);
+
+    /* Disables the actual button ability for these as they just lie behind the loop point text and sample name text
+        and aren't really buttons  but are using the button graphics for ease of use and to keep uniformity */
+    mSampleBacking.setEnabled(false);
+    mStartBacking.setEnabled(false);
+    mEndBacking.setEnabled(false);
 
     auto textBoxColour = juce::Colour(0);
 
@@ -86,12 +81,13 @@ ControlComponent::ControlComponent(AmiSamplerAudioProcessor& p) :
     {
         /* Retains previously stored start loop sample number if input is incorrect or cleared out without new entry */
         if (!startLoopText.getText().containsOnly("0123456789abcdefABCDEF") || startLoopText.getText().isEmpty() || startLoopText.getText().getIntValue() < 0)
-            startLoopText.setText(juce::String(mLoopStart).toUpperCase(), juce::NotificationType::sendNotificationAsync);
-
+            mLoopStart = audioProcessor.getLoopStart();
+        else
         /* Converts start loop sample text from hex value to integer and sets start loop point sample and loop point slider to integer value */
         mLoopStart = startLoopText.getText().getHexValue32();
-        startLoopText.setText(startLoopText.getText().paddedLeft('0', 5), juce::NotificationType::dontSendNotification);
+
         audioProcessor.setLoopStart(mLoopStart);
+        startLoopText.setText(startLoopText.getText().paddedLeft('0', 5), juce::NotificationType::dontSendNotification);
 
         repaint();
     };
@@ -103,7 +99,7 @@ ControlComponent::ControlComponent(AmiSamplerAudioProcessor& p) :
     endLoopText.setColour(juce::Label::backgroundWhenEditingColourId, juce::Colour(0));
     endLoopText.setColour(juce::Label::ColourIds::outlineWhenEditingColourId, juce::Colour(0));
 
-    /* Start loop text box initialization */
+    /* Start loop text box customization */
     endLoopText.setEditable(true, false, false);
     endLoopText.setEnabled(false);
     endLoopText.setJustificationType(juce::Justification::centred);
@@ -112,37 +108,45 @@ ControlComponent::ControlComponent(AmiSamplerAudioProcessor& p) :
     endLoopText.onTextChange = [&] 
     {
         /* Retains previously stored end loop sample number if input is incorrect or cleared out without new entry */
-        if (!endLoopText.getText().containsOnly("0123456789abcdefABCDEF") || endLoopText.getText().isEmpty() || endLoopText.getText().getIntValue() < 0)
-            endLoopText.setText(juce::String(mLoopEnd).toUpperCase(), juce::NotificationType::sendNotificationAsync);
+        if (!endLoopText.getText().containsOnly("0123456789abcdefABCDEF") || endLoopText.getText().isEmpty() || (endLoopText.getText().getHexValue32() < 0))
+            mLoopEnd = audioProcessor.getLoopEnd();
+        else
+            /* Converts end loop sample text from hex value to integer and sets end loop point sample and loop point slider to integer value */
+            mLoopEnd = endLoopText.getText().getHexValue32();
 
-        /* Converts end loop sample text from hex value to integer and sets end loop point sample and loop point slider to integer value */
-        mLoopEnd = endLoopText.getText().getHexValue32();
-        endLoopText.setText(endLoopText.getText().paddedLeft('0', 5), juce::NotificationType::dontSendNotification);
         audioProcessor.setLoopEnd(mLoopEnd);
-
+        endLoopText.setText(endLoopText.getText().paddedLeft('0', 5), juce::NotificationType::dontSendNotification);
+        
         repaint();
     };
 
-    //!!!! TODO: change button to drawn rectangles/line rather than image to optimize graphics !!!!// 
-    //???? Possible TODO: scrap loop enable button for three-way radio button when PING-PONG looping is implemented ????//
     /* Loop enable button customization */
-    auto loopOff = juce::ImageCache::getFromMemory(BinaryData::amiLoopOff_png, BinaryData::amiLoopOff_pngSize);
-    auto loopOn = juce::ImageCache::getFromMemory(BinaryData::amiLoopOn_png, BinaryData::amiLoopOn_pngSize);
-
-    mEnableLoop.setImages(true, true, false, loopOff, 1.0f, juce::Colour(0),
-        loopOff, 1.0, juce::Colour(0x60000000),
-        loopOn, 1.0f, juce::Colour(0), 0.0f);
-
-    /* Loop enable button optimization */
     mEnableLoop.addListener(this);
     mEnableLoop.setToggleable(true);
     mEnableLoop.setToggleState(false, juce::NotificationType::dontSendNotification);
 
+    mEnableLoop.setColour(juce::TextButton::buttonColourId, boxColour);
+    mEnableLoop.setColour(juce::TextButton::textColourOffId, juce::Colours::black);
+    mEnableLoop.setColour(juce::TextButton::buttonOnColourId, juce::Colour(0xffc92d28));
+    mEnableLoop.setColour(juce::TextButton::textColourOnId, juce::Colours::white);
+
+    /* Load button customization */
+    mLoadSample.addListener(this);
+    mLoadSample.setColour(juce::TextButton::buttonColourId, boxColour);
+    mLoadSample.setColour(juce::TextButton::textColourOffId, juce::Colours::black);
+
+    //!!!!!!!! UNUSABLE RIGHT NOW!!!! NOT IMPLEMENTED !!!!!!!!//
+    //!!!! TODO: literally the entire file export function !!!!//
+    /* Save button customization */
+    mSaveSample.addListener(this);
+    mSaveSample.setColour(juce::TextButton::buttonColourId, boxColour);
+    mSaveSample.setColour(juce::TextButton::textColourOffId, juce::Colours::black);
+
     /* Sample clear/Trash button customization */
-    auto clearOff = juce::ImageCache::getFromMemory(BinaryData::amiTrashOff_png, BinaryData::amiClearOff_pngSize);
+    auto clearOff = juce::ImageCache::getFromMemory(BinaryData::amiTrashOff_png, BinaryData::amiTrashOff_pngSize);
     mTrashOff = clearOff.rescaled(60, 66, juce::Graphics::lowResamplingQuality);
-   
-    auto clearClicked = juce::ImageCache::getFromMemory(BinaryData::amiTrashOn_png, BinaryData::amiClearOn_pngSize);
+
+    auto clearClicked = juce::ImageCache::getFromMemory(BinaryData::amiTrashOn_png, BinaryData::amiTrashOn_pngSize);
     mTrashClicked = clearClicked.rescaled(60, 66, juce::Graphics::lowResamplingQuality);
 
     mClearSample.setImages(true, true, true, mTrashOff, 1.0f, juce::Colour(0),
@@ -151,31 +155,6 @@ ControlComponent::ControlComponent(AmiSamplerAudioProcessor& p) :
 
     /* Clear button initialization */
     mClearSample.addListener(this);
-
-    //!!!! TODO: change button to drawn rectangles/line rather than image to optimize graphics !!!!// 
-    //???? Possible TODO: create floppy disk icon for load ????//
-    /* Load button customization */
-    auto loadOff = juce::ImageCache::getFromMemory(BinaryData::amiLoadOff_png, BinaryData::amiLoadOff_pngSize);
-    auto loadOn = juce::ImageCache::getFromMemory(BinaryData::amiLoadOn_png, BinaryData::amiLoadOn_pngSize);
-
-    mLoadSample.setImages(true, true, false, loadOff, 1.0f, juce::Colour(0),
-        loadOff, 1.0, juce::Colour(0x60000000),
-        loadOn, 1.0f, juce::Colour(0), 0.0f);
-
-    mLoadSample.addListener(this);
-
-    //!!!!!!!! UNUSABLE RIGHT NOW!!!! NOT IMPLEMENTED !!!!!!!!//
-    //!!!! TODO: literally the entire file export function !!!!//
-    /* Save button customization */
-    auto saveOff = juce::ImageCache::getFromMemory(BinaryData::amiSaveOff_png, BinaryData::amiSaveOff_pngSize);
-    auto saveOn = juce::ImageCache::getFromMemory(BinaryData::amiSaveOn_png, BinaryData::amiSaveOn_pngSize);
-
-    mSaveSample.setImages(true, true, false, saveOff, 1.0f, juce::Colour(0),
-        saveOff, 1.0, juce::Colour(0xF0000000),
-        saveOff, 1.0f, juce::Colour(0), 0.0f);
-
-    mSaveSample.addListener(this);
-    mSaveSample.setMouseCursor(getMouseCursor().ParentCursor);
 
     /* Clears previous ASCII-to-MIDI map for custom map */
     keyboardComponent.setAvailableRange(24, 108);
@@ -230,8 +209,9 @@ void ControlComponent::paint (juce::Graphics& g)
         startLoopText.setEnabled(false);
         endLoopText.setEnabled(false);
     }
-    
-    juce::Font theFont("AmiDOS Regular", "Regular", proportionOfWidth(0.035f));
+
+    auto theFont = g.getCurrentFont();
+    theFont.setHeight(proportionOfWidth(0.035f));
     startLoopText.setFont(theFont);
     endLoopText.setFont(theFont);
 
@@ -255,7 +235,7 @@ void ControlComponent::paint (juce::Graphics& g)
             startLoopText.getCurrentTextEditor()->setColour(juce::TextEditor::highlightColourId, juce::Colour(0xff0054aa));
             startLoopText.getCurrentTextEditor()->setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::white);
             startLoopText.getCurrentTextEditor()->setColour(juce::CaretComponent::caretColourId, juce::Colour(0xfffc8a00));
-            startLoopText.getCurrentTextEditor()->setMouseCursor(juce::MouseCursor::ParentCursor);
+            //startLoopText.getCurrentTextEditor()->setMouseCursor(juce::MouseCursor::ParentCursor);
         }
 
         if(endLoopText.getCurrentTextEditor() != nullptr)
@@ -263,7 +243,7 @@ void ControlComponent::paint (juce::Graphics& g)
             endLoopText.getCurrentTextEditor()->setColour(juce::TextEditor::highlightColourId, juce::Colour(0xff0054aa));
             endLoopText.getCurrentTextEditor()->setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::white);
             endLoopText.getCurrentTextEditor()->setColour(juce::CaretComponent::caretColourId, juce::Colour(0xfffc8a00));
-            endLoopText.getCurrentTextEditor()->setMouseCursor(juce::MouseCursor::ParentCursor);
+            //endLoopText.getCurrentTextEditor()->setMouseCursor(juce::MouseCursor::ParentCursor);
         }
     }
 
@@ -294,24 +274,12 @@ void ControlComponent::paint (juce::Graphics& g)
     g.fillRect(juce::Rectangle<float>(proportionOfWidth(0.894f), proportionOfHeight(0.62f), proportionOfWidth(0.075f), proportionOfHeight(0.02f)));
     keyboardComponent.setKeyWidth(keyboardComponent.getWhiteNoteLength() * 0.1776f);
     
-    /* Draws box graphics behind loop point text boxes and sample name */
-    auto sampleBox = juce::ImageCache::getFromMemory(BinaryData::amiBoxBacking_png, BinaryData::amiBoxBacking_pngSize);
-
-    if (!sampleBox.isNull())
-    {
-        mBoxBacking.setImage(sampleBox, juce::RectanglePlacement::stretchToFit);
-        mStartBacking.setImage(sampleBox, juce::RectanglePlacement::stretchToFit);
-        mEndBacking.setImage(sampleBox, juce::RectanglePlacement::stretchToFit);
-    }
-    else
-    {
-        jassert(!sampleBox.isNull());
-    }
 }
 void ControlComponent::paintOverChildren(juce::Graphics& g)
 {
+    auto theFont = g.getCurrentFont();
+    theFont.setHeight(proportionOfWidth(0.0325f));
 
-    juce::Font theFont("AmiDOS Regular", "Regular", (proportionOfWidth(0.0325f)));
     g.setFont(theFont);
 
     g.setColour(juce::Colours::black);
@@ -350,7 +318,7 @@ void ControlComponent::resized()
 {
     /* Draws positioning and sizing for components, maintaining position and size when window resized */
     //???? Possible TODO: clean this up // works well but seemingly-arbitrary values are harder to read ????//
-    mBoxBacking.setBoundsRelative(0.4f, 0.4f, 0.4f, 0.07f);
+    mSampleBacking.setBoundsRelative(0.4f, 0.4f, 0.4f, 0.07f);
 
     mClearSample.setBoundsRelative(0.884f, 0.657f, 0.09375f, 0.1375f);
 
@@ -358,10 +326,12 @@ void ControlComponent::resized()
     mSaveSample.setBoundsRelative(0.8f, 0.4f, 0.1f, 0.07f);
 
     mEnableLoop.setBoundsRelative(0.0f, 0.4f, 0.1, 0.07f);
+
     mStartBacking.setBoundsRelative(0.1f, 0.4f, 0.15f, 0.07f);
     mEndBacking.setBoundsRelative(0.25f, 0.4f, 0.15f, 0.07f);
-    startLoopText.setBoundsRelative(0.15f, 0.4f, 0.1f, 0.07f);
-    endLoopText.setBoundsRelative(0.3f, 0.4f, 0.1f, 0.07f);
+
+    startLoopText.setBoundsRelative(0.139f, 0.4f, 0.1f, 0.07f);
+    endLoopText.setBoundsRelative(0.289f, 0.4f, 0.1f, 0.07f);
 
     keyboardComponent.setBoundsRelative(0.0f, 0.85f, 1.0f, 0.15f);
     mADSR.setBoundsRelative(0.0f, 0.65f, 0.33f, 0.675f);
@@ -411,10 +381,17 @@ void ControlComponent::buttonClicked(juce::Button* button)
     /* Opens directory window for sample loading */
     if (button == &mLoadSample)
     {
+        mLoadSample.setColour(juce::TextButton::buttonColourId, juce::Colour(0xffc92d28));
+        mLoadSample.setColour(juce::TextButton::textColourOffId, juce::Colours::white);
+
         audioProcessor.buttonLoadFile();
-        keyboardComponent.grabKeyboardFocus();
         audioProcessor.setLoopStart(audioProcessor.getSliderStart() * audioProcessor.getWaveForm().getNumSamples());
         audioProcessor.setLoopEnd(audioProcessor.getSliderEnd() * audioProcessor.getWaveForm().getNumSamples());
+
+        keyboardComponent.grabKeyboardFocus();
+
+        mLoadSample.setColour(juce::TextButton::buttonColourId, juce::Colour(0xff9e9e9e));
+        mLoadSample.setColour(juce::TextButton::textColourOffId, juce::Colours::black);
     }
 }
 

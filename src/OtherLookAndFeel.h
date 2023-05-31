@@ -32,16 +32,31 @@ public:
     OtherLookAndFeel(AmiSamplerAudioProcessor& p);
     ~OtherLookAndFeel() override;
 
+    /* Custom global font */
+    const juce::Font getCustomFont();
+    juce::Typeface::Ptr getTypefaceForFont(const juce::Font& f) override;
+    juce::Font getLabelFont(juce::Label&) override;
+
+    juce::MouseCursor getMouseCursorFor(juce::Component&) override;
+
     /* Sets slider thumb area */
     int getSliderThumbRadius(juce::Slider& slider) override;
 
     /* Custom linear slider graphics */
     void drawLinearSlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float minSliderPos,
         float maxSliderPos, const juce::Slider::SliderStyle, juce::Slider& slider) override;
+    
+    void drawPointer(juce::Graphics& g, const float x, const float y, const float diameter,
+        const juce::Colour& colour, float width) noexcept;
 
     /* Custom scrollbar graphics */
     void drawScrollbar(juce::Graphics& g, juce::ScrollBar& scrollbar, int x, int y, int width, int height,
                         bool isScrollbarVertical, int thumbStartPosition,int thumbSize, bool isMouseOver, bool isMouseDown) override;
+
+    void drawButtonBackground(juce::Graphics&, juce::Button&, const juce::Colour& backgroundColour,
+                              bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
+
+    juce::Font getTextButtonFont(juce::TextButton&, int buttonHeight) override;
 
 private:
 

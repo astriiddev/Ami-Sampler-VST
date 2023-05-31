@@ -2,8 +2,8 @@
 
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Ami Sampler\Source\Ami Icons">
-      <UniqueIdentifier>{F6E565CF-3731-96DB-E757-3098E929E3FF}</UniqueIdentifier>
+    <Filter Include="Ami Sampler\Resources">
+      <UniqueIdentifier>{17075B1F-FD10-3CEB-C2BE-46E1A4B00C76}</UniqueIdentifier>
     </Filter>
     <Filter Include="Ami Sampler\Source">
       <UniqueIdentifier>{EB326B81-91C3-53F5-7A5A-3924D03F6529}</UniqueIdentifier>
@@ -580,31 +580,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\PluginProcessor.cpp">
+    <ClCompile Include="..\..\src\WaveThumbnail.cpp">
       <Filter>Ami Sampler\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\PluginEditor.cpp">
+    <ClCompile Include="..\..\src\WaveWindow.cpp">
       <Filter>Ami Sampler\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\WaveThumbnail.cpp">
+    <ClCompile Include="..\..\src\ADSRComponent.cpp">
       <Filter>Ami Sampler\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\ADSRComponent.cpp">
+    <ClCompile Include="..\..\src\ControlComponent.cpp">
       <Filter>Ami Sampler\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\ControlComponent.cpp">
+    <ClCompile Include="..\..\src\NewSamplerVoice.cpp">
       <Filter>Ami Sampler\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\LoopSliderLnF.cpp">
+    <ClCompile Include="..\..\src\OtherLookAndFeel.cpp">
       <Filter>Ami Sampler\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\OtherLookAndFeel.cpp">
+    <ClCompile Include="..\..\src\PluginEditor.cpp">
       <Filter>Ami Sampler\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\NewSamplerVoice.cpp">
-      <Filter>Ami Sampler\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\WaveWindow.cpp">
+    <ClCompile Include="..\..\src\PluginProcessor.cpp">
       <Filter>Ami Sampler\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\..\..\Program Files\JUCE\modules\juce_audio_basics\audio_play_head\juce_AudioPlayHead.cpp">
@@ -2940,31 +2937,28 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\PluginProcessor.h">
+    <ClInclude Include="..\..\src\WaveThumbnail.h">
       <Filter>Ami Sampler\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\PluginEditor.h">
+    <ClInclude Include="..\..\src\WaveWindow.h">
       <Filter>Ami Sampler\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\WaveThumbnail.h">
+    <ClInclude Include="..\..\src\ADSRComponent.h">
       <Filter>Ami Sampler\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\ADSRComponent.h">
+    <ClInclude Include="..\..\src\ControlComponent.h">
       <Filter>Ami Sampler\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\ControlComponent.h">
+    <ClInclude Include="..\..\src\NewSamplerVoice.h">
       <Filter>Ami Sampler\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\LoopSliderLnF.h">
+    <ClInclude Include="..\..\src\OtherLookAndFeel.h">
       <Filter>Ami Sampler\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\OtherLookAndFeel.h">
+    <ClInclude Include="..\..\src\PluginEditor.h">
       <Filter>Ami Sampler\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\NewSamplerVoice.h">
-      <Filter>Ami Sampler\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\WaveWindow.h">
+    <ClInclude Include="..\..\src\PluginProcessor.h">
       <Filter>Ami Sampler\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\..\Program Files\JUCE\modules\juce_audio_basics\audio_play_head\juce_AudioPlayHead.h">
@@ -5675,47 +5669,29 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\..\..\Pictures\AmiMED Icon.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
+    <None Include="..\..\res\amiMouseCursor.png">
+      <Filter>Ami Sampler\Resources</Filter>
     </None>
-    <None Include="..\..\..\..\..\..\Pictures\amiTrashOff.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
+    <None Include="..\..\res\amiTrashOff.png">
+      <Filter>Ami Sampler\Resources</Filter>
     </None>
-    <None Include="..\..\..\..\..\..\Pictures\amiTrashOn.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
+    <None Include="..\..\res\amiTrashOn.png">
+      <Filter>Ami Sampler\Resources</Filter>
     </None>
-    <None Include="..\..\..\..\..\..\Pictures\amiBoxBacking.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
+    <None Include="..\..\res\astriid_amiga.png">
+      <Filter>Ami Sampler\Resources</Filter>
     </None>
-    <None Include="..\..\..\..\..\..\Pictures\astriid_amiga.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
+    <None Include="..\..\res\amiBoxBacking.png">
+      <Filter>Ami Sampler\Resources</Filter>
     </None>
-    <None Include="..\..\..\..\..\..\Pictures\amiSaveOff.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
+    <None Include="..\..\res\amidos.ttf">
+      <Filter>Ami Sampler\Resources</Filter>
     </None>
-    <None Include="..\..\..\..\..\..\Pictures\amiSaveOn.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
+    <None Include="..\..\res\AmiLogo.png">
+      <Filter>Ami Sampler\Resources</Filter>
     </None>
-    <None Include="..\..\..\..\..\..\Pictures\amiMouseCursor.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
-    </None>
-    <None Include="..\..\..\..\..\..\Pictures\amiLoadOff.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
-    </None>
-    <None Include="..\..\..\..\..\..\Pictures\amiLoadOn.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
-    </None>
-    <None Include="..\..\..\..\..\..\Pictures\amiLoopOff.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
-    </None>
-    <None Include="..\..\..\..\..\..\Pictures\amiLoopOn.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
-    </None>
-    <None Include="..\..\..\..\..\..\Pictures\amiClearOff.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
-    </None>
-    <None Include="..\..\..\..\..\..\Pictures\amiClearOn.png">
-      <Filter>Ami Sampler\Source\Ami Icons</Filter>
+    <None Include="..\..\src\LICENSE.txt">
+      <Filter>Ami Sampler\Source</Filter>
     </None>
     <None Include="..\..\..\..\..\..\..\..\Program Files\JUCE\modules\juce_audio_devices\native\oboe\CMakeLists.txt">
       <Filter>JUCE Modules\juce_audio_devices\native\oboe</Filter>

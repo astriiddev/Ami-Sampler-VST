@@ -13,7 +13,6 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "ADSRComponent.h"
-#include "OtherLookAndFeel.h"
 
 /*
   ==============================================================================
@@ -54,10 +53,10 @@ private:
 
     /* Start and End sample loop point text */
     int mLoopStart{ 0 }, mLoopEnd{ 0 };
-    juce::Label startLoopText, endLoopText;
+    juce::Label startLoopText{ "000000" }, endLoopText{ "000000" };
 
     /* Image generate */
-    juce::ImageComponent mLogoImage, mBoxBacking, mStartBacking, mEndBacking;
+    juce::ImageComponent mLogoImage;
     juce::Image mTrashOff, mTrashClicked;
 
     /* Inheret ADSR sliders for window placement */
@@ -73,9 +72,12 @@ private:
         mColonPressed{ false }, mSlashPressed{ false }, mEqualPressed{ false },
         mBraktPressed{ false }, mBSlhPressed{ false };
 
+    juce::TextButton mLoadSample{ "LOAD" }, mEnableLoop{ "LOOP" }, mSaveSample{ "SAVE" },
+                     mSampleBacking{ " " }, mStartBacking{ " " }, mEndBacking{ " " };
+
     /* Image buttons */
     //???? Possible TODO: change loop enable, load sample, and save sample into drawable graphics instead of images ????//
-    juce::ImageButton mClearSample, mEnableLoop, mLoadSample, mSaveSample;
+    juce::ImageButton mClearSample/*, mEnableLoop, mLoadSample, mSaveSample*/;
 
     AmiSamplerAudioProcessor& audioProcessor;
 
