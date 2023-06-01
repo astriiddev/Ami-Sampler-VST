@@ -10,7 +10,7 @@ module for my Amiga.
 So, naturally, the first VST that I set out to make would of course be a VST that allows me to get that same sound
 but in the ease of my DAW. I call it: the Ami Sampler.
 
-![Ami_Sampler_FYee3W471g](https://github.com/astriiddev/Ami-Sampler/assets/98296288/d1cfa2bc-cb25-4aa8-b42f-892287b48d68)
+![amiGui](https://github.com/astriiddev/Ami-Sampler/assets/98296288/44d04111-85bb-438b-8128-ceece8f5e98d)
 
 This still has a long way to go until it's fully developed, but it's at least at a point in its development that
 an alpha release can be usable in a session.
@@ -36,7 +36,7 @@ really set out on using a program similar to Audacity to downsample your files, 
 outta ten; although I still find that its "non-interpolated" downsampling is still too smooth when compared 
 to Fasttracker's or SoX's downsampling or compared to audio recorded on an actual Amiga.
 
-![amiGui](https://github.com/astriiddev/Ami-Sampler/assets/98296288/59932c5b-ee1c-4b47-a112-b6406d5062c8)
+https://github.com/astriiddev/Ami-Sampler/assets/98296288/f3b99aa5-8ebc-4199-a978-0265354fa05a
 
 # TODO
 
