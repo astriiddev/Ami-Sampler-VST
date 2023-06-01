@@ -36,7 +36,7 @@ really set out on using a program similar to Audacity to downsample your files, 
 outta ten; although I still find that its "non-interpolated" downsampling is still too smooth when compared 
 to Fasttracker's or SoX's downsampling or compared to audio recorded on an actual Amiga.
 
-https://github.com/astriiddev/Ami-Sampler/assets/98296288/f3b99aa5-8ebc-4199-a978-0265354fa05a
+![amiGui](https://github.com/astriiddev/Ami-Sampler/assets/98296288/59932c5b-ee1c-4b47-a112-b6406d5062c8)
 
 # TODO
 
