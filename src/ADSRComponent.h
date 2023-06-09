@@ -3,7 +3,7 @@
 
     ADSRComponent.h
     Created: 22 Jan 2023 7:35:43pm
-    Author:  finle
+    Author:  _astriid_
 
   ==============================================================================
 */
@@ -17,7 +17,7 @@
   ==============================================================================
 
 
-  //// ADSR and volume controls ////
+  //// ADSR and volume/pan controls ////
 
 
   ==============================================================================
@@ -34,9 +34,6 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    /* Greys out pan slider, will be deleted when panning is implemented */
-    void paintOverChildren(juce::Graphics&) override;
-
 private:
 
     /* Slider and label intialization */
@@ -45,6 +42,7 @@ private:
 
     /* Slider value tree -- saves slider setting to be recalled when DAW session is reopened */
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mVolAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mPanAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mAttackAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mDecayAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mSustainAttachment;

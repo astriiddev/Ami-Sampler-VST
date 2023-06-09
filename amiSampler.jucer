@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="qw31oj" name="Ami Sampler" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
-              defines="JUCE_MODAL_LOOPS_PERMITTED=1&#10;&#10;" pluginManufacturer="_astriid_"
-              pluginName="Ami Sampler" pluginDesc="Tracker-era inspired sampler"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
+              defines="JUCE_MODAL_LOOPS_PERMITTED=1&#10;JUCE_WAV_DO_NOT_PAD_HEADER_SIZE&#10;"
+              pluginManufacturer="_astriid_" pluginName="Ami Sampler" pluginDesc="Tracker-era inspired sampler"
               cppLanguageStandard="latest" displaySplashScreen="1" splashScreenColour="Light"
-              pluginFormats="buildStandalone,buildVST3">
+              pluginFormats="buildStandalone,buildVST3" pluginVST3Category="Instrument,Sampler,Synth"
+              lv2Uri="https://github.com/astriiddev/Ami-Sampler">
   <MAINGROUP id="LaMq1U" name="Ami Sampler">
-    <GROUP id="{9B92ABD7-9422-A7B4-FBE5-EC470A0776E2}" name="Resources">
+    <GROUP id="{9B92ABD7-9422-A7B4-FBE5-EC470A0776E2}" name="res">
       <FILE id="ZPrj5P" name="amiMouseCursor.png" compile="0" resource="1"
             file="res/amiMouseCursor.png"/>
       <FILE id="JxyBgg" name="amiTrashOff.png" compile="0" resource="1" file="res/amiTrashOff.png"/>
@@ -19,7 +20,7 @@
       <FILE id="fdaaph" name="amidos.ttf" compile="0" resource="1" file="res/amidos.ttf"/>
       <FILE id="zNLqDA" name="AmiLogo.png" compile="0" resource="1" file="res/AmiLogo.png"/>
     </GROUP>
-    <GROUP id="{AC83E5EC-ED80-021A-9A1C-065954D8046E}" name="Source">
+    <GROUP id="{AC83E5EC-ED80-021A-9A1C-065954D8046E}" name="src">
       <FILE id="c4FY6O" name="WaveThumbnail.cpp" compile="1" resource="0"
             file="src/WaveThumbnail.cpp"/>
       <FILE id="fHG1B4" name="WaveThumbnail.h" compile="0" resource="0" file="src/WaveThumbnail.h"/>
@@ -46,8 +47,14 @@
       <FILE id="VmyTe7" name="PluginEditor.h" compile="0" resource="0" file="src/PluginEditor.h"/>
       <FILE id="RJ3teA" name="PluginProcessor.cpp" compile="1" resource="0"
             file="src/PluginProcessor.cpp"/>
+      <FILE id="kUdB61" name="RCFilters.cpp" compile="1" resource="0" file="src/RCFilters.cpp"/>
+      <FILE id="Ig45b0" name="RCFilters.h" compile="0" resource="0" file="src/RCFilters.h"/>
       <FILE id="u3W5Oc" name="PluginProcessor.h" compile="0" resource="0"
             file="src/PluginProcessor.h"/>
+      <FILE id="KecMvy" name="ButtonComponent.cpp" compile="1" resource="0"
+            file="src/ButtonComponent.cpp"/>
+      <FILE id="vjDjyk" name="ButtonComponent.h" compile="0" resource="0"
+            file="src/ButtonComponent.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>

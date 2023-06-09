@@ -3,7 +3,7 @@
 
     WaveThumbnail.cpp
     Created: 22 Jan 2023 6:07:35pm
-    Author:  finle
+    Author:  _astriid_
 
   ==============================================================================
 */
@@ -29,24 +29,19 @@ WaveThumbnail::WaveThumbnail(AmiSamplerAudioProcessor& p) : audioProcessor(p)
     mLoopPoints.setSliderStyle(juce::Slider::SliderStyle::TwoValueHorizontal);
     mLoopPoints.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
     mLoopPoints.setRange(0.0f, 1.0f, 0.0000001f);
-   // mLoopPoints.setLookAndFeel(&mCursor);
     mLoopPoints.addListener(this);
 
-    /* Slider intialiaztion and mouse listener for mouse dragging */
     setWantsKeyboardFocus(false);
     addAndMakeVisible(mLoopPoints);
-    addMouseListener(this, true);
 }
 
 WaveThumbnail::~WaveThumbnail()
 {
-    /* Slider dereferencing */
-    //mLoopPoints.setLookAndFeel(nullptr);
-    mLoopPoints.removeListener(this);
 }
 
 void WaveThumbnail::paint (juce::Graphics& g)
 {
+
     /* Disables slider if no waveform is loaded */
     if (audioProcessor.getWaveForm().getNumSamples() <= 0)
     {
@@ -57,7 +52,9 @@ void WaveThumbnail::paint (juce::Graphics& g)
     {
         mLoopPoints.setEnabled(true);
         mLoopPoints.setVisible(true);
-        mLoopPoints.setMinAndMaxValues(audioProcessor.getSliderStart(), audioProcessor.getSliderEnd(), juce::sendNotificationAsync);
+
+        mLoopPoints.setMinAndMaxValues(audioProcessor.getSliderStart(), 
+            audioProcessor.getSliderEnd(), juce::sendNotificationAsync);
     }
 
     /* Sets loop points to sample values in audio file, disables and hides loop sliders if no loop metadata is found */
@@ -99,7 +96,7 @@ void WaveThumbnail::paint (juce::Graphics& g)
                 getHeight(), 0.0f);
             p.lineTo(pointX, pointY);
         }
-        
+
         g.strokePath(p, juce::PathStrokeType(1.0f, juce::PathStrokeType::mitered,
             juce::PathStrokeType::butt));
 
@@ -124,6 +121,24 @@ void WaveThumbnail::paint (juce::Graphics& g)
     g.setColour(juce::Colour(0xfffc8a00));
     g.drawLine(centerZero, proportionOfHeight(0.01f));
 
+    /* Draws triangles at top of loop points for easier visability and slider movement */
+    minLoopFlag.clear();
+    minLoopFlag.startNewSubPath(mLoopPoints.getPositionOfValue(mLoopPoints.getMinValue()) - 10, 0);
+    minLoopFlag.lineTo(mLoopPoints.getPositionOfValue(mLoopPoints.getMinValue()), 10);
+    minLoopFlag.lineTo(mLoopPoints.getPositionOfValue(mLoopPoints.getMinValue()) + 10, 0);
+    minLoopFlag.closeSubPath();
+
+    maxLoopFlag.clear();
+    maxLoopFlag.startNewSubPath(mLoopPoints.getPositionOfValue(mLoopPoints.getMaxValue()) - 10, 0);
+    maxLoopFlag.lineTo(mLoopPoints.getPositionOfValue(mLoopPoints.getMaxValue()), 10);
+    maxLoopFlag.lineTo(mLoopPoints.getPositionOfValue(mLoopPoints.getMaxValue()) + 10, 0);
+    maxLoopFlag.closeSubPath();
+    
+    if(mLoopPoints.isVisible())
+    {
+        g.fillPath(minLoopFlag);
+        g.fillPath(maxLoopFlag);
+    }
 
     /* Draws cursor line to mouse click in waveform */
     g.setColour(juce::Colours::white);
@@ -143,15 +158,17 @@ void WaveThumbnail::resized()
 
 bool WaveThumbnail::isInterestedInFileDrag(const juce::StringArray& files)
 {
-    /* File type specification */
+    /* File type specification; .smp is Fasttracker 2.08's extension for .raw
+        if file has no extension, it gets loaded as 8-bit signed PCM */
     //!!!! TODO: include 8SVX formatted .IFF files in allowed file types !!!!//
     for (auto file : files)
     {
-        if (file.contains(".wav") || file.contains(".mp3") || file.contains(".aif") || file.contains(".raw") || file.contains(".smp"))
-        {
+        if (file.contains(".wav") || file.contains(".aif") || file.contains(".aiff") || 
+            file.contains(".raw") || file.contains(".smp") || !file.contains("."))
+
             return true;
-        }
     }
+
     return false;
 }
 
@@ -173,7 +190,7 @@ void WaveThumbnail::filesDropped(const juce::StringArray& files, int x, int y)
     std::default_delete<juce::File>file;
 
     /* Returns zoom to completely zoomed out and sets loop point sample values from new sample */
-    mScaleFactor = 1.0f;
+    //mScaleFactor = 1.0f;
     mLoopPoints.setMinAndMaxValues(audioProcessor.getSliderStart(), audioProcessor.getSliderEnd(), juce::sendNotificationAsync);
     setStartAndEndLoop();
     repaint();
@@ -183,30 +200,28 @@ void WaveThumbnail::sliderValueChanged(juce::Slider* slider)
 {
     /* Sets loop point sample values to slider drag */
     if (slider == &mLoopPoints)
-    {
         setStartAndEndLoop();
-    }
 }
 
 void WaveThumbnail::setStartAndEndLoop()
 {   
     /* Sets loop point sample values to slider position */
-    audioProcessor.setLoopStart(juce::roundToInt(mLoopPoints.getMinValue() * audioProcessor.getWaveForm().getNumSamples()));
-    audioProcessor.setLoopEnd(juce::roundToInt(mLoopPoints.getMaxValue() * audioProcessor.getWaveForm().getNumSamples()));
+    audioProcessor.setLoopStart(juce::roundToInt(mLoopPoints.getMinValue() * (double)audioProcessor.getWaveForm().getNumSamples()));
+    audioProcessor.setLoopEnd(juce::roundToInt(mLoopPoints.getMaxValue() * (double)audioProcessor.getWaveForm().getNumSamples()));
 }
 
 bool WaveThumbnail::hitTest(int x, int y)
 {
-    /* JUCE has no setSliderSnapsToMousePosition(false) function for two value sliders
-       This stops the slider from snapping to all mouse clicks, creates a small windowed
-       area around slider positions so that sliders only move when the mouse is down on 
-       or directly near the slider positions */
+    /* JUCE has no setSliderSnapsToMousePosition(false) function for two value sliders; this stops the slider from 
+       snapping to all mouse clicks, creates a small windowed area around slider positions so that sliders only move
+       when the mouse is down on  or directly near the slider positions or on the loop point flags */
     mLoopPoints.setMouseCursor(juce::MouseCursor::ParentCursor);
     mOnLoopPoint = false;
-    const int loopWindow = proportionOfWidth(0.0015f);
+    const int loopWindow = proportionOfWidth(0.001f);
 
-    if ((x <= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMinValue())) + loopWindow && x >= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMinValue())) - loopWindow ||
-        x <= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMaxValue())) + loopWindow && x >= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMaxValue())) - loopWindow))
+    if (x <= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMinValue())) + loopWindow && x >= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMinValue())) - loopWindow ||
+        x <= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMaxValue())) + loopWindow && x >= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMaxValue())) - loopWindow ||
+        minLoopFlag.contains(x, y) || maxLoopFlag.contains(x, y))
     {
         mLoopPoints.setInterceptsMouseClicks(true, true);
         mOnLoopPoint = true;
@@ -238,6 +253,7 @@ void WaveThumbnail::mouseDown(const juce::MouseEvent& e)
 void WaveThumbnail::mouseDrag(const juce::MouseEvent& e)
 {
     /* Zooms waveform in and out. Click and drag down for zooming in, drag up for zooming out */
+
     if (e.mouseWasDraggedSinceMouseDown() && !mOnLoopPoint)
     {
         if (e.getDistanceFromDragStartY() / 10.0f > 1.0f)
@@ -271,9 +287,7 @@ void WaveThumbnail::mouseWheelMove(const juce::MouseEvent& e, const juce::MouseW
 
     /* Scroll through waveform with X scroll */
     if (wheel.deltaX != 0)
-    {
         mCentreWave -= wheel.deltaX/200;
-    }
 
     /* Sets X and Y scrolling bounds */
     if (mScaleFactor <= 1)

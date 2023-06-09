@@ -3,7 +3,7 @@
 
     WaveThumbnail.h
     Created: 22 Jan 2023 6:07:35pm
-    Author:  finle
+    Author:  _astriid_
 
   ==============================================================================
 */
@@ -12,6 +12,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "OtherLookAndFeel.h"
 
 /*
   ==============================================================================
@@ -26,8 +27,8 @@
 //==============================================================================
 class WaveThumbnail : public juce::Component,
                               public juce::FileDragAndDropTarget,
-                              public juce::Slider::Listener,
-                              public juce::MouseListener
+                              public juce::Slider::Listener
+
 {
 public:
     WaveThumbnail(AmiSamplerAudioProcessor& p);
@@ -44,7 +45,7 @@ public:
     void sliderValueChanged(juce::Slider* slider) override;
     void setStartAndEndLoop();
 
-    /* Mouse listener functions */
+    /* Mouse functions */
     bool hitTest(int x, int y) override;
     void mouseDrag(const juce::MouseEvent& event) override;
     void mouseDown(const juce::MouseEvent& event) override;
@@ -57,22 +58,18 @@ public:
     /* Loop point values to be called by other components */
     juce::Slider& getLoopPoints() { return mLoopPoints; }
 
-
 private:
 
     /* Sample values to be drawn in waveform */
     std::vector<float> mAudioPoints;
 
     /* Two value slider and custom graphics for two value slider */
-    /*???? Possible TODO: loop point graphics //could// be put into OtherLookAndFeel and //
-      shared with drawLinearSlider function to need fewer files, but giving loop point sliders //
-      their own drawLinearSlider makes it easier to edit their graphics on the fly quicker ????*/
     juce::Slider mLoopPoints;
+    juce::Path minLoopFlag, maxLoopFlag;
 
-    float mCentreWave = 0.5f;
+    float mCentreWave = 0.0f;
     float mScaleFactor = 1.0f;
     bool mOnLoopPoint = false;
-
 
     AmiSamplerAudioProcessor& audioProcessor;
 

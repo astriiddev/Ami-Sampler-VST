@@ -4,7 +4,7 @@ ce/*
 
     ControlComponent.cpp
     Created: 13 May 2023 5:43:35pm
-    Author:  finle
+    Author:  _astriid_
 
   ==============================================================================
 */
@@ -26,41 +26,21 @@ ce/*
   inheret them into this component like the ADSR sliders ????*/
 
 //==============================================================================
-ControlComponent::ControlComponent(AmiSamplerAudioProcessor& p) :
+ControlComponent::ControlComponent(AmiSamplerAudioProcessor& p) : mADSR(p), mButtons(p),
     keyboardComponent(p.getKeyState(), juce::MidiKeyboardComponent::horizontalKeyboard), 
-    mADSR(p), audioProcessor(p)
+    audioProcessor(p)
 {
     /* GUI control initialization */
 
     addAndMakeVisible(mLogoImage);
+    addAndMakeVisible(mButtons);
     addAndMakeVisible(mADSR);
-
-    addAndMakeVisible(mSampleBacking);
-    addAndMakeVisible(mStartBacking);
-    addAndMakeVisible(mEndBacking);
 
     addAndMakeVisible(startLoopText);
     addAndMakeVisible(endLoopText);
-    addAndMakeVisible(mEnableLoop);
-
-    addAndMakeVisible(mLoadSample);
-    addAndMakeVisible(mClearSample);
-    addAndMakeVisible(mSaveSample);
+    addAndMakeVisible(replenLoopText);
 
     addAndMakeVisible(keyboardComponent);
-
-    /* Grey colour for all the text label backings*/
-    auto boxColour = juce::Colour(0xff9e9e9e);
-
-    mSampleBacking.setColour(juce::TextButton::buttonColourId, boxColour);
-    mStartBacking.setColour(juce::TextButton::buttonColourId, boxColour);
-    mEndBacking.setColour(juce::TextButton::buttonColourId, boxColour);
-
-    /* Disables the actual button ability for these as they just lie behind the loop point text and sample name text
-        and aren't really buttons  but are using the button graphics for ease of use and to keep uniformity */
-    mSampleBacking.setEnabled(false);
-    mStartBacking.setEnabled(false);
-    mEndBacking.setEnabled(false);
 
     auto textBoxColour = juce::Colour(0);
 
@@ -87,7 +67,7 @@ ControlComponent::ControlComponent(AmiSamplerAudioProcessor& p) :
         mLoopStart = startLoopText.getText().getHexValue32();
 
         audioProcessor.setLoopStart(mLoopStart);
-        startLoopText.setText(startLoopText.getText().paddedLeft('0', 5), juce::NotificationType::dontSendNotification);
+        startLoopText.setText(startLoopText.getText().paddedLeft('0', 7), juce::NotificationType::dontSendNotification);
 
         repaint();
     };
@@ -115,117 +95,92 @@ ControlComponent::ControlComponent(AmiSamplerAudioProcessor& p) :
             mLoopEnd = endLoopText.getText().getHexValue32();
 
         audioProcessor.setLoopEnd(mLoopEnd);
-        endLoopText.setText(endLoopText.getText().paddedLeft('0', 5), juce::NotificationType::dontSendNotification);
+        endLoopText.setText(endLoopText.getText().paddedLeft('0', 7), juce::NotificationType::dontSendNotification);
         
         repaint();
     };
 
-    /* Loop enable button customization */
-    mEnableLoop.addListener(this);
-    mEnableLoop.setToggleable(true);
-    mEnableLoop.setToggleState(false, juce::NotificationType::dontSendNotification);
+    /* Replen loop text box customization */
+    replenLoopText.setColour(juce::Label::backgroundColourId, textBoxColour);
+    replenLoopText.setColour(juce::Label::textColourId, juce::Colours::black);
+    replenLoopText.setColour(juce::Label::textWhenEditingColourId, juce::Colours::black);
+    replenLoopText.setColour(juce::Label::backgroundWhenEditingColourId, juce::Colour(0));
+    replenLoopText.setColour(juce::Label::ColourIds::outlineWhenEditingColourId, juce::Colour(0));
 
-    mEnableLoop.setColour(juce::TextButton::buttonColourId, boxColour);
-    mEnableLoop.setColour(juce::TextButton::textColourOffId, juce::Colours::black);
-    mEnableLoop.setColour(juce::TextButton::buttonOnColourId, juce::Colour(0xffc92d28));
-    mEnableLoop.setColour(juce::TextButton::textColourOnId, juce::Colours::white);
+    /* Start loop text box customization */
+    replenLoopText.setEditable(true, false, false);
+    replenLoopText.setEnabled(false);
+    replenLoopText.setJustificationType(juce::Justification::centred);
+    replenLoopText.setBorderSize(juce::BorderSize < int>(0));
 
-    /* Load button customization */
-    mLoadSample.addListener(this);
-    mLoadSample.setColour(juce::TextButton::buttonColourId, boxColour);
-    mLoadSample.setColour(juce::TextButton::textColourOffId, juce::Colours::black);
+    replenLoopText.onTextChange = [&]
+    {
+        /* Retains previously stored end loop sample number if input is incorrect or cleared out without new entry */
+        if (!replenLoopText.getText().containsOnly("0123456789abcdefABCDEF") || replenLoopText.getText().isEmpty() || (replenLoopText.getText().getHexValue32() < 0))
+            mLoopEnd = audioProcessor.getLoopEnd();
+        else
+            /* Converts end loop sample text from hex value to integer and sets end loop point sample and loop point slider to integer value */
+            mLoopEnd = replenLoopText.getText().getHexValue32() + mLoopStart;
 
-    //!!!!!!!! UNUSABLE RIGHT NOW!!!! NOT IMPLEMENTED !!!!!!!!//
-    //!!!! TODO: literally the entire file export function !!!!//
-    /* Save button customization */
-    mSaveSample.addListener(this);
-    mSaveSample.setColour(juce::TextButton::buttonColourId, boxColour);
-    mSaveSample.setColour(juce::TextButton::textColourOffId, juce::Colours::black);
+        audioProcessor.setLoopEnd(mLoopEnd);
+        replenLoopText.setText(replenLoopText.getText().paddedLeft('0', 7), juce::NotificationType::dontSendNotification);
 
-    /* Sample clear/Trash button customization */
-    auto clearOff = juce::ImageCache::getFromMemory(BinaryData::amiTrashOff_png, BinaryData::amiTrashOff_pngSize);
-    mTrashOff = clearOff.rescaled(60, 66, juce::Graphics::lowResamplingQuality);
+        repaint();
+    };
 
-    auto clearClicked = juce::ImageCache::getFromMemory(BinaryData::amiTrashOn_png, BinaryData::amiTrashOn_pngSize);
-    mTrashClicked = clearClicked.rescaled(60, 66, juce::Graphics::lowResamplingQuality);
-
-    mClearSample.setImages(true, true, true, mTrashOff, 1.0f, juce::Colour(0),
-        mTrashOff, 1.0, juce::Colour(0x60000000),
-        mTrashClicked, 1.0f, juce::Colour(0), 0.0f);
-
-    /* Clear button initialization */
-    mClearSample.addListener(this);
+    keyboardComponent.setAvailableRange(24, 108);
 
     /* Clears previous ASCII-to-MIDI map for custom map */
-    keyboardComponent.setAvailableRange(24, 108);
     keyboardComponent.clearKeyMappings();
-
-    //???? Possible TODO: ASCII MIDI enable/disable button (pass key presses to DAW when disabled) ????//
-    /* Creates first two octaves of ASCII-to-MIDI map, mapped to Protracker/Fasttracker ASCII MIDI map */
-    /* First octave starts at key Z and ends at key M // Second octave starts at key Q and ends at key \ */
-    int noteLower = 0;
-    for (char c : "zsxdcvgbhnjmq2w3er5t6y7ui9o0p[")
-        keyboardComponent.setKeyPressForNote({ c, 0, 0 }, noteLower++);
-
-    /* JUCE ASCII map doesn't seem to capture keypresses for key = or \  so ] has to be 
-       added separate in order for = and \ to be implemented in keypress function */
-    keyboardComponent.setKeyPressForNote(juce::KeyPress(']'), 31);
-
-    // Sets default C-note base octave to octave 5 (same as Fasttracker II default octave) //
-    keyboardComponent.setKeyPressBaseOctave(numPadVal);
 }
 
 ControlComponent::~ControlComponent()
 {
-    /* Button dereferencing */
-    mEnableLoop.removeListener(this);
-    mLoadSample.removeListener(this);
-    mClearSample.removeListener(this);
-    mSaveSample.removeListener(this);
 }
 
 void ControlComponent::paint (juce::Graphics& g)
 {
     //???? Possible TODO: clean up all proportionOfWidth/Height // works well but seemingly-arbitrary values are harder to read ????//
-
+    
     g.fillAll(juce::Colour(0xff0054aa));
 
     /* Recalls last base octave setting from previous session */
     if (numPadVal != audioProcessor.getBaseOctave())
-    {
         numPadVal = audioProcessor.getBaseOctave();
-    }
 
     /* Enable and disable loop point text boxes occuring to current loop enable button setting */
     if(audioProcessor.getLoopEnable())
     {
-        mEnableLoop.setToggleState(true, juce::NotificationType::dontSendNotification);
         startLoopText.setEnabled(true);
         endLoopText.setEnabled(true);
+        replenLoopText.setEnabled(true);
     }
     else if (!audioProcessor.getLoopEnable())
     {
-        mEnableLoop.setToggleState(false, juce::NotificationType::dontSendNotification);
         startLoopText.setEnabled(false);
         endLoopText.setEnabled(false);
+        replenLoopText.setEnabled(false);
     }
 
     auto theFont = g.getCurrentFont();
     theFont.setHeight(proportionOfWidth(0.035f));
     startLoopText.setFont(theFont);
     endLoopText.setFont(theFont);
+    replenLoopText.setFont(theFont);
 
-    if (!startLoopText.isBeingEdited() && !endLoopText.isBeingEdited())
+    if (!startLoopText.isBeingEdited() && !endLoopText.isBeingEdited() && !replenLoopText.isBeingEdited())
     {
         /* Tracks current loop point slider positions and passes loop point samples to text boxes in hexadecimal values*/
         std::stringstream startLoopToHex;
         std::stringstream endLoopToHex;
+        std::stringstream replenLoopToHex;
         startLoopToHex << std::hex << audioProcessor.getLoopStart();
         endLoopToHex << std::hex << audioProcessor.getLoopEnd();
+        replenLoopToHex << std::hex << audioProcessor.getLoopEnd() - audioProcessor.getLoopStart();
 
         startLoopText.setText(juce::String(startLoopToHex.str()).toUpperCase(), juce::NotificationType::sendNotificationAsync);
         endLoopText.setText(juce::String(endLoopToHex.str()).toUpperCase(), juce::NotificationType::sendNotificationAsync);
-
+        replenLoopText.setText(juce::String(replenLoopToHex.str()).toUpperCase(), juce::NotificationType::sendNotificationAsync);
     }
     else
     {
@@ -235,7 +190,6 @@ void ControlComponent::paint (juce::Graphics& g)
             startLoopText.getCurrentTextEditor()->setColour(juce::TextEditor::highlightColourId, juce::Colour(0xff0054aa));
             startLoopText.getCurrentTextEditor()->setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::white);
             startLoopText.getCurrentTextEditor()->setColour(juce::CaretComponent::caretColourId, juce::Colour(0xfffc8a00));
-            //startLoopText.getCurrentTextEditor()->setMouseCursor(juce::MouseCursor::ParentCursor);
         }
 
         if(endLoopText.getCurrentTextEditor() != nullptr)
@@ -243,7 +197,13 @@ void ControlComponent::paint (juce::Graphics& g)
             endLoopText.getCurrentTextEditor()->setColour(juce::TextEditor::highlightColourId, juce::Colour(0xff0054aa));
             endLoopText.getCurrentTextEditor()->setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::white);
             endLoopText.getCurrentTextEditor()->setColour(juce::CaretComponent::caretColourId, juce::Colour(0xfffc8a00));
-            //endLoopText.getCurrentTextEditor()->setMouseCursor(juce::MouseCursor::ParentCursor);
+        }
+
+        if (replenLoopText.getCurrentTextEditor() != nullptr)
+        {
+            replenLoopText.getCurrentTextEditor()->setColour(juce::TextEditor::highlightColourId, juce::Colour(0xff0054aa));
+            replenLoopText.getCurrentTextEditor()->setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::white);
+            replenLoopText.getCurrentTextEditor()->setColour(juce::CaretComponent::caretColourId, juce::Colour(0xfffc8a00));
         }
     }
 
@@ -258,22 +218,27 @@ void ControlComponent::paint (juce::Graphics& g)
     auto logo = juce::ImageCache::getFromMemory(BinaryData::astriid_amiga_png, BinaryData::astriid_amiga_pngSize);
 
     if (!logo.isNull())
-    {
         mLogoImage.setImage(logo, juce::RectanglePlacement::stretchToFit);
-    }
     else
-    {
         jassert(!logo.isNull());
-    }
 
-    //!!!! TODO: "POWER" LED "brightness" change when Buttersworth filter enable/disable !!!!//
-    /* "Power" and "DRIVE" LED drawing */
-    g.setColour(juce::Colour(0xFF880000));
-    g.fillRect(juce::Rectangle<float>(proportionOfWidth(0.894f), proportionOfHeight(0.58f), proportionOfWidth(0.075f), proportionOfHeight(0.02f)));
-    g.setColour(juce::Colour(0xFF008800));
-    g.fillRect(juce::Rectangle<float>(proportionOfWidth(0.894f), proportionOfHeight(0.62f), proportionOfWidth(0.075f), proportionOfHeight(0.02f)));
-    keyboardComponent.setKeyWidth(keyboardComponent.getWhiteNoteLength() * 0.1776f);
+    /* "POWER" LED drawing, turns to dark red when LED filter is off, 
+        bright red when on, to simulate LED turning off or on */
+    audioProcessor.isLEDOn() ? 
+        g.setColour(juce::Colour(0xFFBB0000)) :
+        g.setColour(juce::Colour(0xFF600000));
+
+    g.fillRect(juce::Rectangle<int>(proportionOfWidth(0.894f), proportionOfHeight(0.58f), proportionOfWidth(0.075f), proportionOfHeight(0.02f)));
     
+    /* "DRIVE" LED drawing, turns to dark green when file is being loaded or file is cleared, 
+        bright green when a sample is loaded, to simulate LED turning off or on */
+    mButtons.wasDiskOpClicked() || audioProcessor.getWaveForm().getNumSamples() <= 0 ?
+        g.setColour(juce::Colour(0xFF008800)):
+        g.setColour(juce::Colour(0xFF00BB00));
+
+    g.fillRect(juce::Rectangle<int>(proportionOfWidth(0.894f), proportionOfHeight(0.62f), proportionOfWidth(0.075f), proportionOfHeight(0.02f)));
+
+    keyboardComponent.setKeyWidth(keyboardComponent.getWhiteNoteLength() * 0.1776f);
 }
 void ControlComponent::paintOverChildren(juce::Graphics& g)
 {
@@ -284,168 +249,96 @@ void ControlComponent::paintOverChildren(juce::Graphics& g)
 
     g.setColour(juce::Colours::black);
 
-    auto sampleTextBounds = juce::Rectangle<int>(proportionOfWidth(0.415f), proportionOfHeight(0.4f),
-        proportionOfWidth(0.49f), proportionOfHeight(0.07f));
+    auto sampleTextBounds = juce::Rectangle<int>(proportionOfWidth(0.45f), proportionOfHeight(0.4f),
+        proportionOfWidth(0.55f), proportionOfHeight(0.07f));
 
     /* Displays sample name, right adjusted, with blank spaces to the left filled in with underscore character */
     /* Fills entire sample name area with underscore character if no sample is loaded */
     if (audioProcessor.getWaveForm().getNumSamples() > 0)
     {
-        g.drawText("SAMPLE:" + audioProcessor.getSampleName().toUpperCase().paddedLeft('_', 17), sampleTextBounds, juce::Justification::centredLeft, false);
+        g.drawText("SAMPLENAME:" + audioProcessor.getSampleName().toUpperCase().paddedLeft('_', 23), sampleTextBounds, juce::Justification::centred, false);
 
         if (audioProcessor.isNewFile()) { repaint(); audioProcessor.setNewFile(false); }
     }
     else
-    {
-        g.drawText("SAMPLE:_________________", sampleTextBounds, juce::Justification::centredLeft, false);
-    }
+        g.drawText("SAMPLENAME:___________________", sampleTextBounds, juce::Justification::centred, false);
 
     g.drawRect(juce::Rectangle<int>(0, proportionOfHeight(0.4f), getWidth(), proportionOfHeight(0.07f)), proportionOfWidth(0.00156f));
-
-    g.setColour(juce::Colour(0xF0000000));
-    g.fillRect(juce::Rectangle<float>(proportionOfWidth(0.8f), proportionOfHeight(0.4f), proportionOfWidth(0.1f), proportionOfHeight(0.07f)));
 
     g.setColour(juce::Colours::black);
 
     /* Start and End labels for corresponding textboxes */
-    g.drawText("S:", juce::Rectangle<int>(proportionOfWidth(0.1f), proportionOfHeight(0.4f),
-        proportionOfWidth(0.04f), proportionOfHeight(0.07f)), juce::Justification::centredRight, false);
-    g.drawText("E:", juce::Rectangle<int>(proportionOfWidth(0.25f), proportionOfHeight(0.4f),
-        proportionOfWidth(0.04f), proportionOfHeight(0.07f)), juce::Justification::centredRight, false);
+    g.drawText(" START:", juce::Rectangle<int>(proportionOfWidth(0.01f), proportionOfHeight(0.47f),
+        proportionOfWidth(0.11f), proportionOfHeight(0.07f)), juce::Justification::centredLeft, false);
+    g.drawText("REPEAT:", juce::Rectangle<int>(proportionOfWidth(0.01f), proportionOfHeight(0.54f),
+        proportionOfWidth(0.11f), proportionOfHeight(0.07f)), juce::Justification::centredLeft, false);
+    g.drawText("REPLEN:", juce::Rectangle<int>(proportionOfWidth(0.01f), proportionOfHeight(0.61f),
+        proportionOfWidth(0.11f), proportionOfHeight(0.07f)), juce::Justification::centredLeft, false);
 }
 
 void ControlComponent::resized()
 {
     /* Draws positioning and sizing for components, maintaining position and size when window resized */
     //???? Possible TODO: clean this up // works well but seemingly-arbitrary values are harder to read ????//
-    mSampleBacking.setBoundsRelative(0.4f, 0.4f, 0.4f, 0.07f);
 
-    mClearSample.setBoundsRelative(0.884f, 0.657f, 0.09375f, 0.1375f);
+    mButtons.setBoundsRelative(0.0f, 0.0f, 1.0f, 1.0f);
 
-    mLoadSample.setBoundsRelative(0.9f, 0.4f, 0.1f, 0.07f);
-    mSaveSample.setBoundsRelative(0.8f, 0.4f, 0.1f, 0.07f);
-
-    mEnableLoop.setBoundsRelative(0.0f, 0.4f, 0.1, 0.07f);
-
-    mStartBacking.setBoundsRelative(0.1f, 0.4f, 0.15f, 0.07f);
-    mEndBacking.setBoundsRelative(0.25f, 0.4f, 0.15f, 0.07f);
-
-    startLoopText.setBoundsRelative(0.139f, 0.4f, 0.1f, 0.07f);
-    endLoopText.setBoundsRelative(0.289f, 0.4f, 0.1f, 0.07f);
+    startLoopText.setBoundsRelative(0.11f, 0.47f, 0.14f, 0.07f);
+    endLoopText.setBoundsRelative(0.11f, 0.54f, 0.14f, 0.07f);
+    replenLoopText.setBoundsRelative(0.11f, 0.61f, 0.14f, 0.07f);
 
     keyboardComponent.setBoundsRelative(0.0f, 0.85f, 1.0f, 0.15f);
-    mADSR.setBoundsRelative(0.0f, 0.65f, 0.33f, 0.675f);
+    mADSR.setBoundsRelative(0.0f, 0.68f, 0.67f, 0.64f);
     mLogoImage.setBoundsRelative(0.7f, 0.49f, 0.289506f, 0.06796875f);
-}
-
-void ControlComponent::buttonClicked(juce::Button* button)
-{
-    /* Enables and disables sample looping occording to Loop enable button setting*/
-    if (button == &mEnableLoop && audioProcessor.getWaveForm().getNumSamples() > 0)
-    {
-        if (!startLoopText.isEnabled())
-        {
-            audioProcessor.setLoopEnable(true);
-            startLoopText.setEnabled(true);
-            endLoopText.setEnabled(true);
-        }
-
-        else if (startLoopText.isEnabled())
-        {
-            audioProcessor.setLoopEnable(false);
-            startLoopText.setEnabled(false);
-            endLoopText.setEnabled(false);
-        }
-
-        keyboardComponent.grabKeyboardFocus();
-        repaint();
-    }
-
-    /* Clears out sample, sets loop points to 0, saves cleared sample status to be recalled in next session */
-    if (button == &mClearSample)
-    {
-        audioProcessor.setLoopStart(0);
-        audioProcessor.setLoopEnd(0);
-        mEnableLoop.setToggleState(false, juce::NotificationType::sendNotificationSync);
-
-        audioProcessor.getSampler().clearSounds();
-        audioProcessor.getWaveForm().setSize(1, 0);
-        audioProcessor.getWaveForm().clear();
-        audioProcessor.getAPVTS().state.setProperty("pathname", (const char*)nullptr, nullptr);
-        keyboardComponent.giveAwayKeyboardFocus();
-        repaint();
-    }
-
-    //!!!! TODO: include 8SVX formatted .IFF files as file type !!!!//
-    //!!!! TODO: have directory window specify file types !!!!//
-    /* Opens directory window for sample loading */
-    if (button == &mLoadSample)
-    {
-        mLoadSample.setColour(juce::TextButton::buttonColourId, juce::Colour(0xffc92d28));
-        mLoadSample.setColour(juce::TextButton::textColourOffId, juce::Colours::white);
-
-        audioProcessor.buttonLoadFile();
-        audioProcessor.setLoopStart(audioProcessor.getSliderStart() * audioProcessor.getWaveForm().getNumSamples());
-        audioProcessor.setLoopEnd(audioProcessor.getSliderEnd() * audioProcessor.getWaveForm().getNumSamples());
-
-        keyboardComponent.grabKeyboardFocus();
-
-        mLoadSample.setColour(juce::TextButton::buttonColourId, juce::Colour(0xff9e9e9e));
-        mLoadSample.setColour(juce::TextButton::textColourOffId, juce::Colours::black);
-    }
 }
 
 bool ControlComponent::keyPressed(const juce::KeyPress& k)
 {   
-    /*???? Possible TODO: currently have to press keys twice to initially recapture focus when focus lost,
-      would be nice to automatically do it with first keypress but still works fine if can't ????*/
     /* Recaptures keyboard focus for ASCII MIDI if focus is lost */
-    if(!mClearSample.hasKeyboardFocus(false) && !keyboardComponent.hasKeyboardFocus(true))
+    if(mButtons.hasKeyboardFocus(true) && !keyboardComponent.hasKeyboardFocus(true))
         keyboardComponent.grabKeyboardFocus();
 
-    /* Changes ASCII map note base octave with function keys a la Fasttracker II */
-    /* Any attempt at more "elegant" code worked fine in standalone but triggers DAW host key shortcuts when used as plugin :( */
-    if (k.isKeyCode(juce::KeyPress::F1Key)) { numPadVal = 1; }
-    if (k.isKeyCode(juce::KeyPress::F2Key)) { numPadVal = 2; }
-    if (k.isKeyCode(juce::KeyPress::F3Key)) { numPadVal = 3; }
-    if (k.isKeyCode(juce::KeyPress::F4Key)) { numPadVal = 4; }
-    if (k.isKeyCode(juce::KeyPress::F5Key)) { numPadVal = 5; }
-    if (k.isKeyCode(juce::KeyPress::F6Key)) { numPadVal = 6; }
-    if (k.isKeyCode(juce::KeyPress::F7Key)) { numPadVal = 7; }
+    /* F12 key switches between A500 and A1200 a la Protracker 2.3 clone*/
+    if (k.isKeyCode(juce::KeyPress::F12Key))
+        audioProcessor.isModelA500() ? audioProcessor.setModelType(false) : audioProcessor.setModelType(true);
 
-    keyboardComponent.setKeyPressBaseOctave(numPadVal);
+    /* Changes ASCII map note base octave with function keys a la Fasttracker II */
+    if (k.getKeyCode() <= juce::KeyPress::F7Key && k.getKeyCode() >= juce::KeyPress::F1Key)
+        numPadVal = k.getKeyCode() - juce::KeyPress::F1Key + 1;
+
     audioProcessor.setBaseOctave(numPadVal);
 
-    /* JUCE only allows one ASCII key mapped to one note */
-    /* This sends Note On MIDI events for note duplicates to maintain Protracker/Fastracker style map */
-    /* m%Pressed bool is required to blocked repeated key presses after initial key press when key is held down */
-    if (k.getTextCharacter() == ',' && !mCommaPressed) { handleExtraNoteOn(0); mCommaPressed = true; }
-    if (k.getTextCharacter() == 'l' && !mLCharPressed) { handleExtraNoteOn(1); mLCharPressed = true; }
-    if (k.getTextCharacter() == '.' && !mDotChPressed) { handleExtraNoteOn(2); mDotChPressed = true; }
-    if (k.getTextCharacter() == ';' && !mColonPressed) { handleExtraNoteOn(3); mColonPressed = true; }
-    if (k.getTextCharacter() == '/' && !mSlashPressed) { handleExtraNoteOn(4); mSlashPressed = true; }
+    /* JUCE has their own ASCII mapping function but it only allows one key per note 
+        and triggers false key releases with mouse event within the window. 
+        
+        This is a more convoluted ASCII mapping function but allows for Protracker/Fasttracker style
+        key mapping and seems to run cleaner than the default ASCII map, although '=' and '\' keys 
+        are still buggy :// */
 
-    /* JUCE's ASCII mapping doesn't support = or \ for some reason. This /kinda/ gets around that but is still buggy
-       = and \ keys sometimes get triggered off with other key releases */
-    if (k.getTextCharacter() == '=' && !mEqualPressed) { handleExtraNoteOn(18);mEqualPressed = true; }
-    if (k.getTextCharacter() == '\\' && !mBSlhPressed) { handleExtraNoteOn(20); mBSlhPressed = true; }
+    /* Uses the integer value of ASCII keys to point to an array of note values for mapping */
+    if (k.getKeyCode() >= ',' && k.getKeyCode() <= ']')
+    {
+        asciiNote = keyPress2Note[k.getKeyCode() - ','];
+
+        if (asciiNote != 0)
+            handleExtraNoteOn(asciiNote - 1);
+    }
 
     return true;
 }
 
 bool ControlComponent::keyStateChanged(const bool isKeyDown)
 {
-    /* sends a Note Off for extended ASCII map keys and resets m%Pressed bool to be used on next key press */
-    /* ANDing key character and m%Pressed bool required to not send unwanted Note Off MIDI event to a key that may still be held down!!!! */ 
+    /* sends a Note Off for ASCII map keys */
     if (!isKeyDown)
     {
-        if (!juce::KeyPress::isKeyCurrentlyDown(',') && mCommaPressed) { handleExtraNoteOff(0); mCommaPressed = false; }
-        if (!juce::KeyPress::isKeyCurrentlyDown('l') && mLCharPressed) { handleExtraNoteOff(1); mLCharPressed = false; }
-        if (!juce::KeyPress::isKeyCurrentlyDown('.') && mDotChPressed) { handleExtraNoteOff(2); mDotChPressed = false; }
-        if (!juce::KeyPress::isKeyCurrentlyDown(';') && mColonPressed) { handleExtraNoteOff(3); mColonPressed = false; }
-        if (!juce::KeyPress::isKeyCurrentlyDown('/') && mSlashPressed) { handleExtraNoteOff(4); mSlashPressed = false; }
-        if (!juce::KeyPress::isKeyCurrentlyDown('=') && mEqualPressed) { handleExtraNoteOff(18);mEqualPressed = false; }
-        if (!juce::KeyPress::isKeyCurrentlyDown('\\')&& mBSlhPressed)  { handleExtraNoteOff(20); mBSlhPressed = false; }
+        for (int c = ','; c <= ']'; c++)
+        {
+            asciiNote = keyPress2Note[c - ','];
+
+            if (!juce::KeyPress::isKeyCurrentlyDown(c))
+                handleExtraNoteOff(asciiNote - 1);
+        }
     }
 
     return true;
@@ -453,15 +346,24 @@ bool ControlComponent::keyStateChanged(const bool isKeyDown)
 
 void ControlComponent::handleExtraNoteOn(const int note)
 {
-    //???? Possible TODO: block Note On event in second row if same note in extended map is currently held down ????//
-    /* Handles the Note On events for extended ASCII map */
+    /* Handles the Note On events for ASCII map */
+
     /* Blocks Note On event for extended map if second row keys of the same note are also held down */
-    if(!audioProcessor.getKeyState().isNoteOn(1, (note + ((numPadVal + 1) * 12))))
-        audioProcessor.getKeyState().noteOn(1, (note + ((numPadVal + 1) * 12)), 1.0f);
+    if(!audioProcessor.getKeyState().isNoteOn(1, (note + ((numPadVal) * 12))))
+        audioProcessor.getKeyState().noteOn(1, (note + ((numPadVal) * 12)), 1.0f);
 }
 
 void ControlComponent::handleExtraNoteOff(const int note)
 {
     /* Handles the Note Off events for extended ASCII map */
-    audioProcessor.getKeyState().noteOff(1, (note + ((numPadVal + 1) * 12)), 0.0f);
+
+    /* The first five notes of the second octave have keys in the first and second row of the ASCII map.
+        This makes sure the notes for both keys get a Note Off only when neither of the keys are down;
+        otherwise the notes will be shut off by any key release */
+    if ((note != 12 || !(juce::KeyPress::isKeyCurrentlyDown(',') || juce::KeyPress::isKeyCurrentlyDown('q'))) &&
+        (note != 13 || !(juce::KeyPress::isKeyCurrentlyDown('l') || juce::KeyPress::isKeyCurrentlyDown('2'))) &&
+        (note != 14 || !(juce::KeyPress::isKeyCurrentlyDown('.') || juce::KeyPress::isKeyCurrentlyDown('w'))) &&
+        (note != 15 || !(juce::KeyPress::isKeyCurrentlyDown(';') || juce::KeyPress::isKeyCurrentlyDown('3'))) &&
+        (note != 16 || !(juce::KeyPress::isKeyCurrentlyDown('/') || juce::KeyPress::isKeyCurrentlyDown('e'))))
+        audioProcessor.getKeyState().noteOff(1, (note + ((numPadVal) * 12)), 0.0f);
 }

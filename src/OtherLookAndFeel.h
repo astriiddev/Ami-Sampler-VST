@@ -3,7 +3,7 @@
 
     OtherLookAndFeel.h
     Created: 13 May 2023 6:14:26pm
-    Author:  finle
+    Author:  _astriid_
 
   ==============================================================================
 */
@@ -47,7 +47,7 @@ public:
         float maxSliderPos, const juce::Slider::SliderStyle, juce::Slider& slider) override;
     
     void drawPointer(juce::Graphics& g, const float x, const float y, const float diameter,
-        const juce::Colour& colour, float width) noexcept;
+        const juce::Colour& colour, float width, static const bool mirror) noexcept;
 
     /* Custom scrollbar graphics */
     void drawScrollbar(juce::Graphics& g, juce::ScrollBar& scrollbar, int x, int y, int width, int height,
@@ -58,7 +58,11 @@ public:
 
     juce::Font getTextButtonFont(juce::TextButton&, int buttonHeight) override;
 
+   // juce::Path& getFlagPath() { return flagPath; }
+
 private:
+
+   // juce::Path flagPath;
 
     AmiSamplerAudioProcessor& audioProcessor;
 
