@@ -23,6 +23,8 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    /* Windows loads custom font in paint() just fine but macOS will not,
+        so an additional font function is needed for cross compatibility */
     void setFont(const juce::Font newFont) { theFont = newFont; }
     
 private:

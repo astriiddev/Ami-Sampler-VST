@@ -64,6 +64,10 @@ AmiSamplerAudioProcessorEditor::~AmiSamplerAudioProcessorEditor()
 void AmiSamplerAudioProcessorEditor::paint (juce::Graphics& g)
 {
     /* Viewport graphics and controls */
+
+
+    /* Windows loads custom font in paint() just fine but macOS will not,
+        so an additional font function is needed for cross compatibility */
     mAmiWindow.setFont(mLookAndFeel.getCustomFont());
     mControl.setFont(mLookAndFeel.getCustomFont());
     /* Returns focus to ASCII MIDI if viewport is clicked*/
