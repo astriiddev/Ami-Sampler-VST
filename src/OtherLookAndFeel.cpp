@@ -149,7 +149,7 @@ void OtherLookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int wid
     {
         /* Two value loop point slider */
 
-        auto loopColour = juce::Colour::Colour(0xfffc8a00);
+        auto loopColour = juce::Colour(0xfffc8a00);
 
         /* Slider track drawing */
         float trackWidth = slider.isHorizontal() ? (float)(height * 0.01f) : (float)width;
@@ -189,7 +189,7 @@ void OtherLookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int wid
 }
 
 void OtherLookAndFeel::drawPointer(juce::Graphics& g, const float x, const float y, const float diameter,
-                                   const juce::Colour& colour, float width, static const bool mirror) noexcept
+                                   const juce::Colour& colour, float width, bool mirror) noexcept
 {
     /* Loop slider thumb drawing */
 

@@ -185,10 +185,6 @@ void WaveThumbnail::filesDropped(const juce::StringArray& files, int x, int y)
         }
     }
 
-    /* File pointer dereferencing */
-    std::default_delete<juce::File>myFile;
-    std::default_delete<juce::File>file;
-
     /* Returns zoom to completely zoomed out and sets loop point sample values from new sample */
     //mScaleFactor = 1.0f;
     mLoopPoints.setMinAndMaxValues(audioProcessor.getSliderStart(), audioProcessor.getSliderEnd(), juce::sendNotificationAsync);
@@ -219,8 +215,8 @@ bool WaveThumbnail::hitTest(int x, int y)
     mOnLoopPoint = false;
     const int loopWindow = proportionOfWidth(0.001f);
 
-    if (x <= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMinValue())) + loopWindow && x >= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMinValue())) - loopWindow ||
-        x <= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMaxValue())) + loopWindow && x >= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMaxValue())) - loopWindow ||
+    if ((x <= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMinValue())) + loopWindow && x >= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMinValue())) - loopWindow) ||
+        (x <= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMaxValue())) + loopWindow && x >= int(mLoopPoints.getPositionOfValue(mLoopPoints.getMaxValue())) - loopWindow )||
         minLoopFlag.contains(x, y) || maxLoopFlag.contains(x, y))
     {
         mLoopPoints.setInterceptsMouseClicks(true, true);

@@ -331,8 +331,8 @@ void AmiSamplerAudioProcessor::saveFile(const juce::String& name)
                 fileSampleRate, mWaveForm.getNumChannels(), fileBitDepth, aifMetaData, 0));
 
         /* Write file */
-        if (writer != nullptr && file.hasFileExtension(".wav") || file.hasFileExtension(".aif") ||
-            file.hasFileExtension(".raw") || file.hasFileExtension(".smp") || file.hasFileExtension(""))
+        if (writer != nullptr && (file.hasFileExtension(".wav") || file.hasFileExtension(".aif") ||
+            file.hasFileExtension(".raw") || file.hasFileExtension(".smp") || file.hasFileExtension("")))
         {
             writer->writeFromAudioSampleBuffer(mWaveForm, 0, mWaveForm.getNumSamples());
 
@@ -398,7 +398,7 @@ void AmiSamplerAudioProcessor::loadFile(const juce::String& path)
     auto file = juce::File(path);
     
     /* Error box if previously used is file not found */
-    if ((!file.exists() || file.getSize() <= 0) && (int)mAPVTS.state.getProperty("pathname") != NULL)
+    if ((!file.exists() || file.getSize() <= 0) && !mAPVTS.state.getProperty("pathname").toString().isEmpty())
     {
         juce::AlertWindow::showMessageBox(juce::AlertWindow::NoIcon,
             "File not found!", path + " not found!", "OK", nullptr);

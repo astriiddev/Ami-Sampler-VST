@@ -241,13 +241,10 @@ void NewSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, i
             if (sourceSamplePosition <= 0)
                 sourceSamplePosition = 0.0f;
 
-            /* Length of the loop. Not doing anything with it now but may use it in a GUI textbox */
-            static int loopLength = getLoopEnd() - getLoopStart();
-
             /* JUCE's linear interpolation. May add back in and make toggleable */
 
             /*auto alpha = (float) (sourceSamplePosition - pos);
-            /*auto invAlpha = 1.0f - alpha;
+            auto invAlpha = 1.0f - alpha;
 
             // just using a very simple linear interpolation here..
             float l = (inL[pos] * invAlpha + inL[pos + 1] * alpha);
@@ -255,20 +252,29 @@ void NewSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, i
                                        : l;*/
 
             float l = inL[pos];
-            float r = l;
+            float r = (inR != nullptr) ? inR[pos] : l;
 
             /* Filter selection */
             if(audioProcessor.isModelA500())
             {
                 l = mRCFilter.onePoleLPFilter(&filterLo, l);
-
+                r = (inR != nullptr) ? mRCFilter.onePoleLPFilter(&filterLo, r) : l;
+                
                 l = mRCFilter.onePoleHPFilter(&filterHi, l);
+                r = (inR != nullptr) ? mRCFilter.onePoleLPFilter(&filterHi, r) : l;
             }
             else
-                l = mRCFilter.onePoleHPFilter(&filterHi, inL[pos]);
+                {
+                    l = mRCFilter.onePoleHPFilter(&filterHi, inL[pos]);
+                    r = (inR != nullptr) ? mRCFilter.onePoleLPFilter(&filterHi, r) : l;
+                    
+                }
 
             if (audioProcessor.isLEDOn())
-                l = mRCFilter.twoPoleLPFilter(&filterLED, l);
+                {
+                    l = mRCFilter.twoPoleLPFilter(&filterLED, l);
+                    r = (inR != nullptr) ? mRCFilter.twoPoleLPFilter(&filterLED, r) : l;
+                }
 
             r = l;
             

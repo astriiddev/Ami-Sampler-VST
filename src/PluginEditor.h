@@ -37,7 +37,7 @@ public:
 
     //=================================modal=============================================
     void paint (juce::Graphics&) override;
-    void resized();
+    void resized() override;
 
 private:
     

@@ -21,7 +21,7 @@
 
 //==============================================================================
 AmiSamplerAudioProcessorEditor::AmiSamplerAudioProcessorEditor (AmiSamplerAudioProcessor& p)
-    : AudioProcessorEditor (&p), mLookAndFeel(p), mAmiWindow(p), mWaveThumbnail(p), mControl(p), audioProcessor(p)
+    : AudioProcessorEditor (&p), mWaveThumbnail(p), mAmiWindow(p), mControl(p), mLookAndFeel(p),  audioProcessor(p)
 {
     /* Custom global graphics */
     juce::LookAndFeel::setDefaultLookAndFeel(&mLookAndFeel);
@@ -31,7 +31,6 @@ AmiSamplerAudioProcessorEditor::AmiSamplerAudioProcessorEditor (AmiSamplerAudioP
     addAndMakeVisible(mWaveThumbnail);
     addAndMakeVisible(mAmiWindow);
     addAndMakeVisible(mViewWave);
-
     /* Passes mouse click through AmiWindow to waveform */
     mAmiWindow.setInterceptsMouseClicks(false, true);
     mWaveThumbnail.setWantsKeyboardFocus(false);
@@ -58,7 +57,6 @@ AmiSamplerAudioProcessorEditor::AmiSamplerAudioProcessorEditor (AmiSamplerAudioP
 AmiSamplerAudioProcessorEditor::~AmiSamplerAudioProcessorEditor()
 {
     /* Dereferences scrollbar graphics */
-
     juce::LookAndFeel::setDefaultLookAndFeel(nullptr);
 }
 
@@ -66,7 +64,8 @@ AmiSamplerAudioProcessorEditor::~AmiSamplerAudioProcessorEditor()
 void AmiSamplerAudioProcessorEditor::paint (juce::Graphics& g)
 {
     /* Viewport graphics and controls */
-
+    mAmiWindow.setFont(mLookAndFeel.getCustomFont());
+    mControl.setFont(mLookAndFeel.getCustomFont());
     /* Returns focus to ASCII MIDI if viewport is clicked*/
     if (mViewWave.hasKeyboardFocus(true))
         mControl.grabKeyboardFocus();

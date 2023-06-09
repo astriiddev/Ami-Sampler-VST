@@ -43,18 +43,20 @@ public:
     void handleExtraNoteOn(int note);
     void handleExtraNoteOff(int note);
 
+    void setFont(const juce::Font newFont) { theFont = newFont; }
+    
 private:
 
     /* Start and End sample loop point text */
     int mLoopStart{ 0 }, mLoopEnd{ 0 }, mLoopReplen{ 0 };
     juce::Label startLoopText{ "000000" }, endLoopText{ "000000" }, replenLoopText{ "000000" };
-
+    
     /* Image generate */
     juce::ImageComponent mLogoImage;
     /* Inheret ADSR sliders for window placement */
     ADSRComponent mADSR;
     ButtonComponent mButtons;
-
+    juce::Font theFont;
     /* ASCII keypress and MIDI Keyboard */
     juce::Component keyListen;
     juce::MidiKeyboardComponent keyboardComponent;

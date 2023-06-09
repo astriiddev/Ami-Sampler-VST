@@ -25,6 +25,7 @@
 WaveWindow::WaveWindow(AmiSamplerAudioProcessor& p) : audioProcessor(p)
 {
     //!!!! TODO: Clean this up and make it reusable for window graphics of other components !!!!//
+    
 }
 
 WaveWindow::~WaveWindow()
@@ -45,7 +46,7 @@ void WaveWindow::paint (juce::Graphics& g)
     /*!!!!TODO Workbench 1.3 style "close," "to front," and "to back" graphic icons // 
       these probably won't have the actual Workbench functionality but they'll make the ~aesthetic~ more accurate and prettier :) !!!!*/
     /* Sampler title and blue lines running next to title */
-    auto theFont = g.getCurrentFont();
+    
     theFont.setHeight(proportionOfWidth(0.03f));
     g.setFont(theFont);
     g.drawFittedText("Ami Sampler 1.3", (getLocalBounds().reduced(proportionOfWidth(0.03925f), 0)), juce::Justification::topLeft, 1);
@@ -66,7 +67,7 @@ void WaveWindow::paint (juce::Graphics& g)
     /* Workbench "First" and "End" scroll snap buttons */
     /*???? Possible TODO: these are just for aesthet at the moment //
       but as I type this it occured to me I could make these snap the waveform cursor to start and end loop slider positions ????*/
-    auto feFont = juce::Font((juce::Font::bold, proportionOfWidth(0.03f)));
+    auto feFont = juce::Font((static_cast<void>(juce::Font::getDefaultSansSerifFontName()), proportionOfWidth(0.03f)));
     g.setColour(juce::Colours::white);
     g.setFont(feFont);
     g.drawText("F", juce::Rectangle<int>(proportionOfWidth(0.0053f), proportionOfHeight(0.11f), proportionOfWidth(0.022f), proportionOfHeight(0.0975f)), juce::Justification::centred, false);

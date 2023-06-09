@@ -1,5 +1,4 @@
 /*
-ce/*
   ==============================================================================
 
     ControlComponent.cpp
@@ -162,7 +161,6 @@ void ControlComponent::paint (juce::Graphics& g)
         replenLoopText.setEnabled(false);
     }
 
-    auto theFont = g.getCurrentFont();
     theFont.setHeight(proportionOfWidth(0.035f));
     startLoopText.setFont(theFont);
     endLoopText.setFont(theFont);
@@ -242,7 +240,7 @@ void ControlComponent::paint (juce::Graphics& g)
 }
 void ControlComponent::paintOverChildren(juce::Graphics& g)
 {
-    auto theFont = g.getCurrentFont();
+    
     theFont.setHeight(proportionOfWidth(0.0325f));
 
     g.setFont(theFont);
@@ -261,7 +259,7 @@ void ControlComponent::paintOverChildren(juce::Graphics& g)
         if (audioProcessor.isNewFile()) { repaint(); audioProcessor.setNewFile(false); }
     }
     else
-        g.drawText("SAMPLENAME:___________________", sampleTextBounds, juce::Justification::centred, false);
+        g.drawText("SAMPLENAME:_______________________", sampleTextBounds, juce::Justification::centred, false);
 
     g.drawRect(juce::Rectangle<int>(0, proportionOfHeight(0.4f), getWidth(), proportionOfHeight(0.07f)), proportionOfWidth(0.00156f));
 

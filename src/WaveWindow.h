@@ -23,8 +23,11 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    void setFont(const juce::Font newFont) { theFont = newFont; }
+    
 private:
 
+    juce::Font theFont;
     AmiSamplerAudioProcessor& audioProcessor;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveWindow)

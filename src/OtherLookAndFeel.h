@@ -47,7 +47,7 @@ public:
         float maxSliderPos, const juce::Slider::SliderStyle, juce::Slider& slider) override;
     
     void drawPointer(juce::Graphics& g, const float x, const float y, const float diameter,
-        const juce::Colour& colour, float width, static const bool mirror) noexcept;
+        const juce::Colour& colour, float width, bool mirror) noexcept;
 
     /* Custom scrollbar graphics */
     void drawScrollbar(juce::Graphics& g, juce::ScrollBar& scrollbar, int x, int y, int width, int height,

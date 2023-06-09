@@ -125,7 +125,7 @@ void ADSRComponent::resized()
 {
     /* Slider positioning and sizing */
 
-    const auto startX = 0.05f, startY = 0.0175f, sliderWidth = 0.167f, sliderHeight = 0.067f ,leftAdj = (startX * 3.0f);
+    const auto startX = 0.05f, startY = 0.0175f, sliderWidth = 0.167f, sliderHeight = 0.067f;
 
     mVolSlider.setBoundsRelative(startX, startY, sliderWidth, sliderHeight);
     mPanSlider.setBoundsRelative((startX + (sliderWidth * 1.3)), startY, sliderWidth, sliderHeight);
