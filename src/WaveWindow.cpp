@@ -3,7 +3,7 @@
 
     WaveWindow.cpp
     Created: 19 May 2023 10:08:47pm
-    Author:  finle
+    Author:  _astriid_
 
   ==============================================================================
 */
@@ -69,8 +69,8 @@ void WaveWindow::paint (juce::Graphics& g)
     auto feFont = juce::Font((juce::Font::bold, proportionOfWidth(0.03f)));
     g.setColour(juce::Colours::white);
     g.setFont(feFont);
-    g.drawText("F", juce::Rectangle<int>(proportionOfWidth(0.0055f), proportionOfHeight(0.11f), proportionOfWidth(0.022f), proportionOfHeight(0.0975f)), juce::Justification::centred, false);
-    g.drawText("E", juce::Rectangle<int>(proportionOfWidth(0.0055f), proportionOfHeight(0.791f), proportionOfWidth(0.022f), proportionOfHeight(0.1f)), juce::Justification::centred, false);
+    g.drawText("F", juce::Rectangle<int>(proportionOfWidth(0.0053f), proportionOfHeight(0.11f), proportionOfWidth(0.022f), proportionOfHeight(0.0975f)), juce::Justification::centred, false);
+    g.drawText("E", juce::Rectangle<int>(proportionOfWidth(0.0053f), proportionOfHeight(0.791f), proportionOfWidth(0.022f), proportionOfHeight(0.1f)), juce::Justification::centred, false);
 }
 
 void WaveWindow::resized()

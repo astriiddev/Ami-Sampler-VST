@@ -26,11 +26,7 @@ AmiSamplerAudioProcessor::AmiSamplerAudioProcessor()
     mFormatManager.registerBasicFormats();
     mAPVTS.state.addListener(this);
     keyState.addListener(this);
-
-    for (int i = 0; i < mNumVoices; i++)
-    {
-        mSampler.addVoice(new NewSamplerVoice(*this));
-    }
+    mSampler.setNoteStealingEnabled(true);
 }
 
 AmiSamplerAudioProcessor::~AmiSamplerAudioProcessor()
@@ -156,7 +152,7 @@ void AmiSamplerAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    /* Captures loop point settings and saves them to value tree  */
+    /* Updates value tree  */
     getLoopStart(); getLoopEnd();
     mSliderStart = (double)mLoopStart / mWaveForm.getNumSamples();
     mSliderEnd = (double)mLoopEnd / mWaveForm.getNumSamples();
@@ -166,6 +162,9 @@ void AmiSamplerAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
 
     mAPVTS.state.setProperty("baseOctave", getBaseOctave(), nullptr);
 
+    mAPVTS.state.setProperty("modeltype", (bool)isModelA500(), nullptr);
+    mAPVTS.state.setProperty("filter", (bool)isLEDOn(), nullptr);
+
     if (mShouldUpdate)
     {
         updateADSR();
@@ -173,33 +172,42 @@ void AmiSamplerAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     
     /* Virtual MIDI event callback */
     keyState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
-    for (const juce::MidiMessageMetadata m : midiMessages)
-    {
-        juce::MidiMessage message = m.getMessage();
-        if (message.isNoteOn())
+
+    /* Monophonic/Polyphonic state*/
+    for (int i = 0; i < 7; ++i)
+    {    
+        /* One-voice monophonic */
+        if (mNumVoiceState == 1 && mSampler.getNumVoices() < 1)
         {
-            // start increasing sample counter
-            mIsNotePlayed = true;
-            mCurrentChannel = message.getChannel();
-            mCurrentNote = message.getNoteNumber();
+            mSampler.addVoice(new NewSamplerVoice(*this));
         }
-        else if (message.isNoteOff())
+        
+        /* Four-voice polyphonic (PT Poly) */
+        else if (mNumVoiceState == 2 && mSampler.getNumVoices() < 4)
         {
-            // reset sample counter
-            mIsNotePlayed = false;
+            mSampler.addVoice(new NewSamplerVoice(*this));
+        }
+
+        /* Eight-voice polyphonic (MED Poly) */
+        else if (mNumVoiceState == 0 && mSampler.getNumVoices() < 8)
+        {
+            mSampler.addVoice(new NewSamplerVoice(*this));
         }
     }
 
+    mAPVTS.state.setProperty("numofvoices", (int)mNumVoiceState, nullptr);
+    mAPVTS.state.setProperty("stereoOn", (bool)mStereo, nullptr);
+
     mSampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+   
+    /* Output buffer with volume and pan controls */
+    auto* channelDataLeft = buffer.getWritePointer(0);
+    auto* channelDataRight = buffer.getWritePointer(1);
 
-    for (int i = 0; i < totalNumOutputChannels; ++i)
+    for (int n = 0; n < buffer.getNumSamples(); ++n)
     {
-        auto* channelData = buffer.getWritePointer(i);
-
-        for (int n = 0; n < buffer.getNumSamples(); ++n)
-        {
-            channelData[n] = buffer.getSample(i, n) * rawVolume;
-        }
+        channelDataLeft[n] = buffer.getSample(0, n) * rawVolume * leftPan;
+        channelDataRight[n] = buffer.getSample(1, n) * rawVolume * rightPan;
     }
 
     midiMessages.clear();
@@ -230,6 +238,7 @@ void AmiSamplerAudioProcessor::setStateInformation (const void* data, int sizeIn
     std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
 
     /* Recalls ADSR, loaded sample, loop points, loop enable state, and ASCII note base */
+    
     if (xmlState.get() != nullptr)
         if (xmlState->hasTagName(mAPVTS.state.getType()))
         {
@@ -238,8 +247,111 @@ void AmiSamplerAudioProcessor::setStateInformation (const void* data, int sizeIn
             mLoopStart = ((double)mAPVTS.state.getProperty("loopStart"));
             mLoopEnd = ((double)mAPVTS.state.getProperty("loopEnd"));
             mLoopEnable = (bool)mAPVTS.state.getProperty("loopEnable");
+
             mBaseOctave = ((int)mAPVTS.state.getProperty("baseOctave"));
+
+            mNumVoiceState = (int)mAPVTS.state.getProperty("numofvoices");
+            mA500 = mAPVTS.state.getProperty("modeltype");
+            mFilterOn = mAPVTS.state.getProperty("filter");
+            mStereo = mAPVTS.state.getProperty("stereoOn");
+
         }
+}
+
+void AmiSamplerAudioProcessor::saveFile(const juce::String& name)
+{
+    /* file formats */
+    juce::WavAudioFormat wavFormat;
+    juce::AiffAudioFormat aifFormat;
+    juce::RawPcmFormat rawFormat;
+    std::unique_ptr<juce::AudioFormatWriter> writer;
+
+    juce::FileChooser chooser{ "Save file" };
+    juce::File file;
+
+    /* Saves loop point metadata if loop points are set.
+        Can't seem to get aif files to save loop point metadata but I also
+        had issues getting SoX, Audacity, and Fasttracker II clone to save
+        aif loop points so manybe it's an aif problem */
+    juce::StringPairArray wavMetaData, aifMetaData;
+
+    if (mLoopEnable)
+    {
+        wavMetaData.set("NumSampleLoops", "1");
+        wavMetaData.set("Loop0Start", juce::String(getLoopStart()));
+        wavMetaData.set("Loop0End", juce::String(getLoopEnd()));
+
+        aifMetaData.set("NumSampleLoops", "1");
+        aifMetaData.set("CueNote0Identifier", "0");
+        aifMetaData.set("CueNote0Text", "Created with Ami Sampler");
+        aifMetaData.set("CueNote0TimeStamp", "3768748643");
+        aifMetaData.set("NumCueNotes", "1");
+
+        aifMetaData.set("Loop0Type", "0");
+        aifMetaData.set("Loop0StartIdentifier", juce::String(getLoopStart()));
+        aifMetaData.set("Loop0EndIdentifier", juce::String(getLoopEnd()));
+        aifMetaData.set("Loop1Type", "0");
+        aifMetaData.set("Loop1StartIdentifier", juce::String(getLoopStart()));
+        aifMetaData.set("Loop1EndIdentifier", juce::String(getLoopEnd()));
+    }
+    else
+        wavMetaData = aifMetaData = NULL;
+
+    /*!!!! TODO: include file types in drop down dialog box */
+    if (chooser.browseForFileToSave(true))
+    {
+        file = chooser.getResult();
+
+        /* if extension isn't specified, save as raw 8-bit signed PCM file */
+        if(file.hasFileExtension(""))
+        {
+            if (file.withFileExtension("raw").exists())
+                file.withFileExtension("raw").deleteFile();
+
+            else if (file.withFileExtension("smp").exists())
+                file.withFileExtension("smp").deleteFile();
+        }
+
+        /* Deletes old file if file is being written over */
+        if (file.exists())
+            file.deleteFile();
+
+        /* WAV file saving */
+        if(file.hasFileExtension(".wav"))
+            writer.reset(wavFormat.createWriterFor(new juce::FileOutputStream(file.withFileExtension("wav")),
+                fileSampleRate, mWaveForm.getNumChannels(), fileBitDepth, wavMetaData, 0));
+
+        /* Raw 8-bit signed PCM saving (.smp in this instance is original Fasttracker II's extension for a .raw audio file) */
+        if (file.hasFileExtension(".raw") || file.hasFileExtension("smp") || file.hasFileExtension(""))
+            writer.reset(rawFormat.createWriterFor(new juce::FileOutputStream(file), NULL, NULL, NULL, NULL, NULL));
+
+        /* AIF/AIFF file saving, no loop points yet :(( */
+        if(file.hasFileExtension(".aif") || file.hasFileExtension(".aiff"))
+            writer.reset(aifFormat.createWriterFor(new juce::FileOutputStream(file),
+                fileSampleRate, mWaveForm.getNumChannels(), fileBitDepth, aifMetaData, 0));
+
+        /* Write file */
+        if (writer != nullptr && file.hasFileExtension(".wav") || file.hasFileExtension(".aif") ||
+            file.hasFileExtension(".raw") || file.hasFileExtension(".smp") || file.hasFileExtension(""))
+        {
+            writer->writeFromAudioSampleBuffer(mWaveForm, 0, mWaveForm.getNumSamples());
+
+            /* Allows user to import saved file to continue working with said file or continue with old file if user says no*/
+            if (juce::NativeMessageBox::showYesNoBox(juce::MessageBoxIconType::QuestionIcon, "Replace Sample?",
+                "Replace currently loaded sample with saved file?", nullptr, nullptr))
+            {
+                loadSavedFile = true;
+                mFilePath = file.getFullPathName();
+            }
+            else
+                loadSavedFile = false;
+        }
+        else
+            juce::AlertWindow::showMessageBox(juce::AlertWindow::NoIcon,
+                "File not saved!", "Could not save file.",
+                "OK", nullptr);
+    }
+        
 }
 
 void AmiSamplerAudioProcessor::buttonLoadFile()
@@ -250,10 +362,11 @@ void AmiSamplerAudioProcessor::buttonLoadFile()
     {
         /* Passes file from browser to file loader */
         auto file = chooser.getResult();
-        /* Only loads file if valid file type */
-        if (file.getFileName().contains(".wav") || file.getFileName().contains(".mp3") || 
-            file.getFileName().contains(".aif") || file.getFileName().contains(".raw") ||
-            file.getFileName().contains(".smp"))
+
+        /* Only loads file if valid file type or no extension is found (loads as 8-bit signed PCM) */
+        if (file.hasFileExtension("wav") || file.hasFileExtension("aif") || file.hasFileExtension("aiff") || 
+            file.hasFileExtension("raw") || file.hasFileExtension("smp") || !file.getFileName().contains("."))
+            
 
             loadFile(file.getFullPathName());
 
@@ -277,7 +390,7 @@ void AmiSamplerAudioProcessor::loadFile(const juce::String& path)
     /* Clears previously loaded samples */
     mSampler.clearSounds();
     newFile = false;
-
+    loadSavedFile = false;
     /* Saves loaded file path to value tree */
     //!!!! TODO: generate a temporary file to be used for recalling and file editing instead of original file !!!!//
     mAPVTS.state.setProperty("pathname", path, nullptr);
@@ -285,7 +398,7 @@ void AmiSamplerAudioProcessor::loadFile(const juce::String& path)
     auto file = juce::File(path);
     
     /* Error box if previously used is file not found */
-    if(!file.exists() && (int)mAPVTS.state.getProperty("pathname") != NULL)
+    if ((!file.exists() || file.getSize() <= 0) && (int)mAPVTS.state.getProperty("pathname") != NULL)
     {
         juce::AlertWindow::showMessageBox(juce::AlertWindow::NoIcon,
             "File not found!", path + " not found!", "OK", nullptr);
@@ -293,7 +406,7 @@ void AmiSamplerAudioProcessor::loadFile(const juce::String& path)
         /* Clears out sample data if previous file isn't found */
         mSampler.clearSounds();
     } 
-    else if(file.exists())
+    else if(file.exists() && file.getSize() > 0)
     {
         newFile = true;
         mSampleName = file.getFileNameWithoutExtension();
@@ -302,20 +415,33 @@ void AmiSamplerAudioProcessor::loadFile(const juce::String& path)
         //!!!! TODO: Create format reader for 8SVX formated .IFF files !!!!//
         std::unique_ptr<juce::AudioFormatReader> mFormatReader (mFormatManager.createReaderFor(file));
 
-        auto sampleLength = static_cast<int>(mFormatReader->lengthInSamples) - 1;
+        auto sampleLength = static_cast<int>(mFormatReader->lengthInSamples);
 
         mWaveForm.setSize(1, sampleLength);
         mFormatReader->read(&mWaveForm, 0, sampleLength, 0, true, false);
 
         /* Reads metadata to find sample loops */
         //???? Possible TODO: if audio is 16 bit or higher, or 44.1khz sample rate or higher, resample to 8-bit 16726hz for Amiga-style sample ???//
+
         auto metaData = mFormatReader.get()->metadataValues;
+
+        fileSampleRate = mFormatReader.get()->sampleRate;
+        fileBitDepth = mFormatReader.get()->bitsPerSample;
 
         if(metaData.containsKey("Loop0Start") && metaData.containsKey("Loop0End"))
         {
             /* If loop metadata is found, set loop points according to the metadata and enable looping */
             auto fileLoopStart = metaData.getValue("Loop0Start", "double").getDoubleValue();
             auto fileLoopEnd = metaData.getValue("Loop0End", "double").getDoubleValue();
+            mSliderStart = fileLoopStart / double(mWaveForm.getNumSamples());
+            mSliderEnd = fileLoopEnd / double(mWaveForm.getNumSamples());
+            mLoopEnable = true;
+        }
+        else if (metaData.containsKey("Loop0StartIdentifier") && metaData.containsKey("Loop0EndIdentifier"))
+        {
+            /* If loop metadata is found, set loop points according to the metadata and enable looping */
+            auto fileLoopStart = metaData.getValue("Loop0StartIdentifier", "double").getDoubleValue();
+            auto fileLoopEnd = metaData.getValue("Loop0EndIdentifier", "double").getDoubleValue();
             mSliderStart = fileLoopStart / double(mWaveForm.getNumSamples());
             mSliderEnd = fileLoopEnd / double(mWaveForm.getNumSamples());
             mLoopEnable = true;
@@ -346,6 +472,25 @@ void AmiSamplerAudioProcessor::updateADSR()
     else
         rawVolume = pow(10, (mAPVTS.getRawParameterValue("VOLUME")->load()/20));
 
+    /* Pan controls */
+    auto panVol = mAPVTS.getRawParameterValue("PANNER")->load();
+    if (panVol < 1.0f)
+    {
+        rightPan = panVol;
+        leftPan = 1.0f;
+    }
+    /* Center pan is 1.0f, with ranges 0.0-1.0 for left and 1.0 to 0.0f for right */
+    else if(panVol > 1.0f)
+    {
+        rightPan = 1.0f;
+        leftPan = (panVol - 2.0f) * -1;
+    }
+    else if (panVol == 1.0f)
+    {
+        rightPan = panVol;
+        leftPan = panVol;
+    }
+
     /* Updates ADSR parameters in real time */
     mADSRParams.attack = mAPVTS.getRawParameterValue("ATTACK")->load();
     mADSRParams.sustain = mAPVTS.getRawParameterValue("SUSTAIN")->load();
@@ -363,11 +508,14 @@ void AmiSamplerAudioProcessor::updateADSR()
 
 juce::AudioProcessorValueTreeState::ParameterLayout AmiSamplerAudioProcessor::createParameters()
 {
-    /* Creates parameters for volume and ADSR sliders*/
+    /* Creates parameters for volume, panning, and ADSR sliders*/
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> parameters;
 
     parameters.push_back(std::make_unique<juce::AudioParameterFloat>("VOLUME", "Volume",
         juce::NormalisableRange<float>(-47.0f, 1.0f, 0.75f), -4.5f));
+
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("PANNER", "Panner",
+        juce::NormalisableRange<float>(0.0f, 2.0f, 2.0/255), 1.0));
 
     parameters.push_back(std::make_unique<juce::AudioParameterFloat>("ATTACK", "Attack",
         juce::NormalisableRange<float>(0.0003f, 10.0f, 0.15625f), 0.0003f));
@@ -404,7 +552,6 @@ void AmiSamplerAudioProcessor::handleNoteOff(juce::MidiKeyboardState* source, in
     auto m = juce::MidiMessage::noteOff(midiChannel, midiNoteNumber, velocity);
     m.setTimeStamp(juce::Time::getMillisecondCounterHiRes() * 0.001);
     midiCollector.addMessageToQueue(m);
-    
 }
 
 //==============================================================================

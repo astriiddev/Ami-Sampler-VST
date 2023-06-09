@@ -3,7 +3,7 @@
 
     OtherLookAndFeel.cpp
     Created: 13 May 2023 6:14:26pm
-    Author:  finle
+    Author:  _astriid_
 
   ==============================================================================
 */
@@ -40,7 +40,7 @@ const juce::Font OtherLookAndFeel::getCustomFont()
 juce::Typeface::Ptr OtherLookAndFeel::getTypefaceForFont(const juce::Font& f)
 {
     /* Returning font typeface */
-    return getCustomFont().getTypeface();
+    return getCustomFont().getTypefacePtr();
 }
 
 juce::Font OtherLookAndFeel::getLabelFont(juce::Label& label)
@@ -60,7 +60,7 @@ juce::MouseCursor OtherLookAndFeel::getMouseCursorFor(juce::Component& c)
 
     /* Resizing pixel art mouse cursor -- lowResamplingQuality stops rescaling from interpolating and retains pixel art graphics  */
     return juce::MouseCursor(mouseCursor.rescaled(mouseCursor.getBounds().getWidth() * (float)c.getTopLevelComponent()->getWidth() / 128,
-            mouseCursor.getBounds().getHeight() * (float)c.getTopLevelComponent()->getHeight() / 96 , juce::Graphics::lowResamplingQuality), 0, 0);
+            mouseCursor.getBounds().getHeight() * (float)c.getTopLevelComponent()->getHeight() / 96 , juce::Graphics::lowResamplingQuality), 1, 1);
 }
 
 juce::Font OtherLookAndFeel::getTextButtonFont(juce::TextButton&, int buttonHeight)
@@ -121,7 +121,7 @@ void OtherLookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int wid
 
         /* Graphics for slider "bevels" */
         g.setColour(juce::Colour(0xFFDDDDFF));
-        g.drawLine((float)x - thumbOffset, (float)y, (float)width + (float)x + thumbOffset, (float)y + 1, 1.0f);
+        g.drawLine((float)x - thumbOffset, (float)y, (float)width + (float)x + thumbOffset, (float)y, 1.0f);
         g.drawLine((float)x - thumbOffset, (float)y, (float)x - thumbOffset, (float)height, 1.0f);
 
         g.setColour(juce::Colour(0xFF4444AA));
@@ -181,28 +181,34 @@ void OtherLookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int wid
 
         /* Draws slider min and max thumbs */
         drawPointer(g, minSliderPos,
-            0.0f, (float)height, loopColour, trackWidth);
+            0.0f, (float)height, loopColour, trackWidth, false);
 
         drawPointer(g, maxSliderPos,
-            0.0f, (float)height, loopColour, trackWidth);
+            0.0f, (float)height, loopColour, trackWidth, true);
     }
 }
 
 void OtherLookAndFeel::drawPointer(juce::Graphics& g, const float x, const float y, const float diameter,
-    const juce::Colour& colour, float width) noexcept
+                                   const juce::Colour& colour, float width, static const bool mirror) noexcept
 {
     /* Loop slider thumb drawing */
 
     /* Makes slider thumbs straight line running from top to bottom of slider drawing */
     //???? Possible TODO: add square or triangle "flags" (a la Protracker or Fasttracker) to tops of thumb graphics ????//
+    float thumbBoxX = 10.0f;
+
     juce::Path p;
+
+    if (mirror)
+        thumbBoxX = -10.0f;
+
     p.startNewSubPath(x, y);
     p.lineTo(x, y + diameter);
     p.closeSubPath();
 
-    g.setColour(colour);
-    g.strokePath(p, juce::PathStrokeType(width * 1.5f, juce::PathStrokeType::mitered,
-        juce::PathStrokeType::butt));
+    g.setColour(colour); 
+    g.strokePath(p, juce::PathStrokeType(width * 2.0f, juce::PathStrokeType::mitered,
+                    juce::PathStrokeType::butt));
 }
 
 void OtherLookAndFeel::drawScrollbar(juce::Graphics& g, juce::ScrollBar& scrollbar, int x, int y, int width, int height,
@@ -347,17 +353,30 @@ void OtherLookAndFeel::drawButtonBackground(juce::Graphics& g, juce::Button& but
     {
         g.fillRect(bounds);
 
-        /* When button is clicked down, remove bevel giving a "pushed down" effect */
+        /* When button is clicked down, darken bevel giving a "pushed down" effect */
         if(!shouldDrawButtonAsDown && !button.getToggleState())
         {
             /* Button beveling, inspired by 8bitbubsy's Fasstracker II beveling */
             g.setColour(backgroundColour.brighter(5.0f));
-            g.drawLine(bounds.getX(), bounds.getY() + 1, bounds.getWidth(), bounds.getY() + 1, 4.0f);
-            g.drawLine(bounds.getX() + 1, bounds.getY(), bounds.getX() + 1, bounds.getHeight(), 4.0f);
+            g.drawLine(bounds.getX(), bounds.getY() + 2, bounds.getWidth(), bounds.getY() + 2, 3.0f);
+            g.drawLine(bounds.getX() + 2, bounds.getY(), bounds.getX() + 2, bounds.getHeight(), 3.0f);
 
             g.setColour(backgroundColour.darker(2.0f));
-            g.drawLine(bounds.getX(), bounds.getHeight() - 1, bounds.getWidth(), bounds.getHeight() - 1, 3.0f);
-            g.drawLine(bounds.getWidth() - 1, bounds.getY(), bounds.getWidth() - 1, bounds.getHeight(), 3.0f);
+            g.drawLine(bounds.getX(), bounds.getHeight() - 2, bounds.getWidth(), bounds.getHeight() - 2, 3.0f);
+            g.drawLine(bounds.getWidth() - 2, bounds.getY(), bounds.getWidth() - 2, bounds.getHeight(), 3.0f);
+
+        }
+        else
+        {
+            /* Button beveling, inspired by 8bitbubsy's Fasstracker II beveling */
+            g.setColour(backgroundColour.darker(0.5f));
+            g.drawLine(bounds.getX(), bounds.getY() + 2, bounds.getWidth(), bounds.getY() + 2, 3.0f);
+            g.drawLine(bounds.getX() + 2, bounds.getY(), bounds.getX() + 2, bounds.getHeight(), 3.0f);
+
+            g.setColour(backgroundColour.darker(2.0f));
+            g.drawLine(bounds.getX(), bounds.getHeight() - 2, bounds.getWidth(), bounds.getHeight() - 2, 3.0f);
+            g.drawLine(bounds.getWidth() - 2, bounds.getY(), bounds.getWidth() - 2, bounds.getHeight(), 3.0f);
+
         }
 
         g.setColour(juce::Colours::black);

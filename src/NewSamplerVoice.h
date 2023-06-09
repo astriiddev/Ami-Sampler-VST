@@ -3,7 +3,7 @@
 
     NewSamplerVoice.h
     Created: 16 May 2023 8:24:19pm
-    Author:  finle
+    Author:  _astriid_
 
   ==============================================================================
 */
@@ -35,6 +35,7 @@
 */
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "RCFilters.h"
 
 /*
   ==============================================================================
@@ -160,15 +161,18 @@ private:
     //==============================================================================
     double pitchRatio = 0;
     
-    double sourceSamplePosition = 0.0f;
+    double sourceSamplePosition{ 0 };;
     float lgain = 0, rgain = 0;
 
     /* Loop point and playhead tracker initialization */
     double mSamplePos = 0.0f;
-    int mLoopStart = 0;
-    int mLoopEnd = 0;
-
+    int mLoopStart = 0, mLoopEnd = 0;
+    
     juce::ADSR adsr;
+    bool releasedNote{ false };
+    RCFilter mRCFilter;
+    RCFilter::OnePoleFilter_t filterLo, filterHi;
+    RCFilter::TwoPoleFilter_t filterLED;
 
     AmiSamplerAudioProcessor& audioProcessor;
 

@@ -68,7 +68,7 @@
  #define JucePlugin_WantsMidiInput         1
 #endif
 #ifndef  JucePlugin_ProducesMidiOutput
- #define JucePlugin_ProducesMidiOutput     0
+ #define JucePlugin_ProducesMidiOutput     1
 #endif
 #ifndef  JucePlugin_IsMidiEffect
  #define JucePlugin_IsMidiEffect           0
@@ -92,7 +92,7 @@
  #define JucePlugin_VSTCategory            kPlugCategSynth
 #endif
 #ifndef  JucePlugin_Vst3Category
- #define JucePlugin_Vst3Category           "Instrument|Synth"
+ #define JucePlugin_Vst3Category           "Instrument|Sampler|Synth"
 #endif
 #ifndef  JucePlugin_AUMainType
  #define JucePlugin_AUMainType             'aumu'

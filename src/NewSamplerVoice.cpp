@@ -3,7 +3,7 @@
 
     NewSamplerVoice.cpp
     Created: 16 May 2023 8:24:19pm
-    Author:  finle
+    Author:  _astriid_
 
   ==============================================================================
 */
@@ -89,9 +89,13 @@ bool NewSamplerSound::appliesToChannel (int /*midiChannel*/)
 }
 
 //==============================================================================
-NewSamplerVoice::NewSamplerVoice(AmiSamplerAudioProcessor& p) : mLoopStart(), mLoopEnd(), audioProcessor(p) 
-{   
+NewSamplerVoice::NewSamplerVoice(AmiSamplerAudioProcessor& p) : mRCFilter(p), audioProcessor(p) 
+{
+    mRCFilter.clearOnePoleFilterState(&filterLo);
+    mRCFilter.clearOnePoleFilterState(&filterHi);
+    mRCFilter.clearTwoPoleFilterState(&filterLED);
 }
+
 NewSamplerVoice::~NewSamplerVoice() {}
 
 bool NewSamplerVoice::canPlaySound (juce::SynthesiserSound* sound)
@@ -101,16 +105,44 @@ bool NewSamplerVoice::canPlaySound (juce::SynthesiserSound* sound)
 
 void NewSamplerVoice::startNote (int midiNoteNumber, float velocity, juce::SynthesiserSound* s, int pitchwheel)
 {
+    
     if (auto* sound = dynamic_cast<const NewSamplerSound*> (s))
     {
         pitchRatio = std::pow (2.0, (midiNoteNumber - sound->midiRootNote) / 12.0)
-                        * sound->sourceSampleRate / getSampleRate();
+                               * sound->sourceSampleRate / getSampleRate();
 
         sourceSamplePosition = 0.0;
         mSamplePos = 0.0f;
 
-        lgain = velocity;
-        rgain = velocity;
+        /* auto-pan counter intitialazion */
+        static uint8_t counter = 0;
+
+        /* Only activates if PaulaStereo button is pressed and is not in monophonic mode */
+        if (audioProcessor.getNumVoiceState() != 1 && audioProcessor.isStereo())
+        {
+            /* first note left, second note right, and continues to switch back and forth */
+            
+            if (counter % 2 == 0)
+            {
+                lgain = velocity;
+                rgain = 0;
+            }
+            if (counter % 2 != 0)
+            {
+                lgain = 0;
+                rgain = velocity;
+            }
+
+            /* resets counter so it doesn't count forever */
+            counter == 8 ? counter = 1 : counter++;
+
+        }
+        else
+        {
+            counter = 0;
+            lgain = velocity;
+            rgain = velocity;
+        }
 
         adsr.setSampleRate (sound->sourceSampleRate);
         adsr.setParameters (sound->params);
@@ -142,6 +174,49 @@ void NewSamplerVoice::controllerMoved (int controllerNumber, int newValue) {}
 //==============================================================================
 void NewSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples)
 {
+    static const double twoPi = juce::MathConstants<double>::twoPi;
+
+    static double dPaulaOutputFreq = audioProcessor.getSampleRate();
+
+    if (dPaulaOutputFreq <= 0.0)
+        dPaulaOutputFreq = 44100.0;
+
+    static double R, C, R1, R2, C1, C2, cutoff, qfactor;
+
+    if (audioProcessor.isModelA500())
+    {
+
+        R = 360.0; // R321 (360 ohm)
+        C = 1e-7;  // C321 (0.1uF)
+        cutoff = 1.0 / (twoPi * R * C); // ~4420.971Hz
+        mRCFilter.setupOnePoleFilter(audioProcessor.getSampleRate(), cutoff, &filterLo);
+
+        // A500 1-pole (6dB/oct) RC high-pass filter:
+        R = 1390.0;   // R324 (1K ohm) + R325 (390 ohm)
+        C = 2.233e-5; // C334 (22uF) + C335 (0.33uF)
+        cutoff = 1.0 / (twoPi * R * C); // ~5.128Hz
+        mRCFilter.setupOnePoleFilter(dPaulaOutputFreq, cutoff, &filterHi);
+    }
+    else
+    {
+        mRCFilter.clearOnePoleFilterState(&filterLo);
+
+        // A1200 1-pole (6dB/oct) RC high-pass filter:
+        R = 1360.0; // R324 (1K ohm resistor) + R325 (360 ohm resistor)
+        C = 2.2e-5; // C334 (22uF capacitor)
+        cutoff = 1.0 / (twoPi * R * C); // ~5.319Hz
+        mRCFilter.setupOnePoleFilter(dPaulaOutputFreq, cutoff, &filterHi);
+    }
+
+    // 2-pole (12dB/oct) RC low-pass filter ("LED" filter, same values on A500/A1200):
+    R1 = 10000.0; // R322 (10K ohm)
+    R2 = 10000.0; // R323 (10K ohm)
+    C1 = 6.8e-9;  // C322 (6800pF)
+    C2 = 3.9e-9;  // C323 (3900pF)
+    cutoff = 1.0 / (twoPi * std::sqrt(R1 * R2 * C1 * C2)); // ~3090.533Hz
+    qfactor = std::sqrt(R1 * R2 * C1 * C2) / (C2 * (R1 + R2)); // ~0.660225
+    mRCFilter.setupTwoPoleFilter(dPaulaOutputFreq, cutoff, qfactor, &filterLED);
+
 
     if (auto* playingSound = static_cast<NewSamplerSound*> (getCurrentlyPlayingSound().get()))
     {
@@ -149,14 +224,13 @@ void NewSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, i
         setLoopStart(audioProcessor.getLoopStart());
         setLoopEnd(audioProcessor.getLoopEnd());
 
-
         auto& data = *playingSound->data;
         const float* const inL = data.getReadPointer(0);
         const float* const inR = data.getNumChannels() > 1 ? data.getReadPointer(1) : nullptr;
 
         float* outL = outputBuffer.getWritePointer(0, startSample);
         float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer(1, startSample) : nullptr;
-
+        
         while (--numSamples >= 0)
         {
             int pos = (int)sourceSamplePosition;
@@ -180,10 +254,24 @@ void NewSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, i
             float r = (inR != nullptr) ? (inR[pos] * invAlpha + inR[pos + 1] * alpha)
                                        : l;*/
 
-            /* Simple nearest-neighbor interpolation */
-            //!!!! TODO: add toggleable Amiga-500 style RC filter and toggleable LED Butterworth filter !!!!//
             float l = inL[pos];
-            float r = (inR != nullptr) ? inR[pos] : l;
+            float r = l;
+
+            /* Filter selection */
+            if(audioProcessor.isModelA500())
+            {
+                l = mRCFilter.onePoleLPFilter(&filterLo, l);
+
+                l = mRCFilter.onePoleHPFilter(&filterHi, l);
+            }
+            else
+                l = mRCFilter.onePoleHPFilter(&filterHi, inL[pos]);
+
+            if (audioProcessor.isLEDOn())
+                l = mRCFilter.twoPoleLPFilter(&filterLED, l);
+
+            r = l;
+            
 
             auto envelopeValue = adsr.getNextSample();
 
@@ -205,9 +293,7 @@ void NewSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, i
 
             /* Playhead tracker reset with new note */
             if (!audioProcessor.isNewNote() || !adsr.isActive())
-            {
                 mSamplePos = 0;
-            }
             
             mSamplePos += pitchRatio;
 

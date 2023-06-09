@@ -69,19 +69,15 @@ void AmiSamplerAudioProcessorEditor::paint (juce::Graphics& g)
 
     /* Returns focus to ASCII MIDI if viewport is clicked*/
     if (mViewWave.hasKeyboardFocus(true))
-    {
         mControl.grabKeyboardFocus();
-    }
 
     /* Turns on scrollbar even when zoomed out */
     mViewWave.setScrollBarsShown(false, true, false, true);
     mViewWave.setScrollBarThickness(proportionOfHeight(0.0232f));
 
-    /* Resets viewport zoom to full waveform if scale factor returns to 1 */
-    if (mWaveThumbnail.getScaleFactor() <= 1.0f)
-    {
+    /* Resets viewport zoom to full waveform if scale factor returns to 1 or if new file is loaded */
+    if (mWaveThumbnail.getScaleFactor() <= 1.0f || audioProcessor.isNewFile())
         mWaveThumbnail.setBoundsRelative(0, 0.0f, 1.0f, 0.97f);
-    }
 
     /* Centers zoomed waveform scrolling on waveform cursor */
     static float currentScaleFactor = 1.0f, currentCenterPoint = 0.5f;

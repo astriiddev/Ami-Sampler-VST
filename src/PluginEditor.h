@@ -38,7 +38,7 @@ public:
     //=================================modal=============================================
     void paint (juce::Graphics&) override;
     void resized();
-    
+
 private:
     
     /* GUI component initialization */

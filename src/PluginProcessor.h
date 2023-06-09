@@ -9,13 +9,11 @@
 #pragma once
 
 #include <JuceHeader.h>
-//#include "WaveThumbnail.h"
+
 //==============================================================================
-/**
-*/
-class AmiSamplerAudioProcessor : public juce::AudioProcessor, 
-                                   public juce::ValueTree::Listener,
-                                   public juce::MidiKeyboardStateListener
+class AmiSamplerAudioProcessor : public juce::AudioProcessor,
+    public juce::ValueTree::Listener,
+    public juce::MidiKeyboardStateListener
 #if JucePlugin_Enable_ARA
     , public juce::AudioProcessorARAExtension
 #endif
@@ -59,17 +57,20 @@ public:
     void setStateInformation(const void* data, int sizeInBytes) override;
 
     /* Audio file loading */
-    void buttonLoadFile();
     void loadFile(const juce::String& path);
+    void buttonLoadFile();
+    void saveFile(const juce::String&);
 
     bool& isNewFile() { return newFile; }
     void setNewFile(bool isNew) { newFile = isNew; }
+    bool& loadingSaveFile() { return loadSavedFile; }
 
     /* Sampler initialization */
     int getNumSamplerSounds() { return mSampler.getNumSounds(); }
     juce::AudioBuffer<float>& getWaveForm() { return mWaveForm; }
     juce::Synthesiser& getSampler() { return mSampler; }
     juce::String& getSampleName() { return mSampleName; }
+    juce::String& getFilePath() { return mFilePath; }
 
     /* ADSR initialization and update callback */
     void updateADSR();
@@ -86,9 +87,6 @@ public:
 
     void setBaseOctave(int baseOctave) { mBaseOctave = baseOctave; }
     int& getBaseOctave() { return mBaseOctave; }
-
-    int& getCurrentNote() { return mCurrentNote; }
-    int& getCurrentChannel() { return mCurrentChannel; }
 
     /* Loop point start and enable callbacks */
     void setSliderStart(double sliderStart) { mSliderStart = sliderStart; }
@@ -111,22 +109,35 @@ public:
     std::atomic<bool>& isNotePlayed() { return mIsNotePlayed; }
     std::atomic<bool>& isNewNote() { return mNewNote; }
 
+    std::atomic<bool>& isModelA500() { return mA500; }
+    void setModelType(bool isA500) { mA500 = isA500; }
+
+    std::atomic<bool>& isLEDOn() { return mFilterOn; }
+    void setFilterOn(bool filterOn) { mFilterOn = filterOn; }
+
+    std::atomic<int>& getNumVoiceState() { return mNumVoiceState; }
+    void setNumVoiceState(int numVoiceState) { mNumVoiceState = numVoiceState; }
+
+    std::atomic<bool>& isStereo() { return mStereo; }
+    void setStereo(bool stereo) { mStereo = stereo; }
+
 private:
+
     juce::Synthesiser mSampler;
     const int mNumVoices{ 8 };
     juce::AudioBuffer<float> mWaveForm;
-    juce::String mSampleName;
-    bool newFile{ false };
+    juce::String mSampleName, mFilePath;
+    
+    bool newFile{ false }, loadSavedFile{ false };
+    double fileSampleRate{ 0 }, fileBitDepth{ 8 };
 
     /* Loop point value intialization */
-    int mLoopStart{ 0 };
-    int mLoopEnd{ 0 };
-    double mSliderStart{ 0.0f };
-    double mSliderEnd{ 1.0f };
+    int mLoopStart{ 0 }, mLoopEnd{ 0 };
+    double mSliderStart{ 0.0f }, mSliderEnd{ 1.0f };
 
     /* ADSR intialization */
     juce::ADSR adsr;
-    double rawVolume{ 1.0f };
+    double rawVolume{ 1.0f }, leftPan{ 1.0f }, rightPan{ 1.0f };
     juce::ADSR::Parameters mADSRParams;
     juce::AudioFormatManager mFormatManager;
 
@@ -140,17 +151,11 @@ private:
     juce::MidiMessageCollector midiCollector;
     juce::MidiBuffer mMidiBuffer;
     juce::MidiKeyboardState keyState;
-
     int mBaseOctave{ 5 };
-
-    int mCurrentNote{ 0 };
-    int mCurrentChannel{ 0 };
-
-    std::atomic<int>  mSamplePos{ 0 };
-    std::atomic<bool> mNewNote{ false };
-    std::atomic<bool> mShouldUpdate{ false };
-    std::atomic<bool> mIsNotePlayed{ false };
-    std::atomic<bool> mLoopEnable{ false };
+    
+    std::atomic<int>  mSamplePos{ 0 }, mNumVoiceState{ 0 };
+    std::atomic<bool> mA500{ false }, mFilterOn{ false }, mStereo{ false }, mNewNote{ false },
+                      mShouldUpdate{ false }, mIsNotePlayed{ false }, mLoopEnable{ false };
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmiSamplerAudioProcessor)
