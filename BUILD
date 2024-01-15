@@ -7,6 +7,10 @@
           ║                            ║
           ╙────────────────────────────╜
 
+These instructions are for building Ami Sampler from the source
+files. For instructions on installing the already-made application 
+and VST files, see INSTALL.
+
 ═══════════════════╕
     DEPENDENCIES:  │
 ═══════════════════╛
