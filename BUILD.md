@@ -7,9 +7,9 @@
           ║                            ║
           ╙────────────────────────────╜
 
-These instructions are for building Ami Sampler from the source
-files. For instructions on installing the already-made application 
-and VST files, see INSTALL.
+These instructions are for building Ami Sampler from the 
+source files. For instructions on installing the already 
+made application and VST files, see INSTALL.
 
 ═══════════════════╕
     DEPENDENCIES:  │
@@ -25,11 +25,11 @@ and VST files, see INSTALL.
 4. [OPTIONAL] Download the Samples directory and its
    subdirectories
 
-═══════════════════╕
-   PATCHING JUCE:  │
-═══════════════════╛
+   ═══════════════════╕ 
+      PATCHING JUCE:  │ 
+   ═══════════════════╛ 
 
-    The Ami Sampler makes a few changes to the JUCE 
+The Ami Sampler makes a few changes to the JUCE 
 source code and therefore requires a handful of files for
 patching JUCE to build it. One patch fixes a bug in Windows
 for detecting the key state for the \ and = keys which is
