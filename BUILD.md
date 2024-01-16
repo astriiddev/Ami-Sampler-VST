@@ -97,7 +97,7 @@ On Windows:
    for your build and build the project. Once complete, 
    navigate to the Release subdirectory in your ami directory. 
    Move the VST file (typically found at 
-       VST3/ami.vst3/Contents/win_x86_64/ami.vst3) 
+       VST3\ami.vst3\Contents\x86_64-win\ami.vst3) 
    into your computer's VST3 folder (typically found in 
        C:\Program Files\Common Files\VST3). 
    Move the .exe found at Releases\Standalone\ami.exe to the 
