@@ -4,7 +4,7 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               pluginVST3Category="Instrument,Sampler" pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginManufacturer="_astriid_" defines="JUCE_MODAL_LOOPS_PERMITTED=1&#10;JUCE_WAV_DO_NOT_PAD_HEADER_SIZE=1"
-              lv2Uri="https://lv2plug.in/ns/ext/urid" cppLanguageStandard="17"
+              lv2Uri="http://lv2plug.in/ns/ext/uri-map/Ami" cppLanguageStandard="17"
               pluginFormats="buildStandalone,buildVST3">
   <MAINGROUP id="Ijfsy3" name="Ami Sampler">
     <GROUP id="{C7AD4387-7952-6AD4-EE7D-472A6827E160}" name="Res">
