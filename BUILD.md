@@ -25,9 +25,9 @@ made application and VST files, see INSTALL.
 4. [OPTIONAL] Download the Samples directory and its
    subdirectories
 
-   ═══════════════════╕ 
-      PATCHING JUCE:  │ 
-   ═══════════════════╛ 
+═══════════════════╕ 
+   PATCHING JUCE:  │ 
+═══════════════════╛ 
 
 The Ami Sampler makes a few changes to the JUCE 
 source code and therefore requires a handful of files for
