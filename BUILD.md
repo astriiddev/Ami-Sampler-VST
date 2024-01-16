@@ -164,4 +164,5 @@ Olav Sørensen (8bitbubsy)
 The folks over at WinUAE
 The folks over at Cloanto/Amiga Forever
 And, of course, to Commodore themselves
+
 </pre>
