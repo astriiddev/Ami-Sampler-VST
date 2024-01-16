@@ -1,4 +1,4 @@
-
+<pre>
 
              ╓────────────────────────────╖
              ║                            ║
@@ -55,14 +55,17 @@ For manual installation:
 
 For automatic installation:
 
-3. run sudo chmod +x amisamp.sh
-4. run sudo ./amisamp.sh
+3. run sudo chmod +x install.sh
+4. run ./install.sh
+5. type in root user password when prompted 
 
 For manual installation:
 
 3. move Ami Sampler.vst3 to ~/.vst3
 4. move Ami Sampler.lv2 to ~/.lv2
-5. move Ami Sampler to /usr/bin
+5. move ami to /usr/local/bin
+6. move ami.png to ~/.local/share/icons
+7. move ami.desktop to ~/.local/share/applications
 
 ═══════════════════════════════════════════════════════════════════
 
@@ -89,3 +92,4 @@ Olav Sørensen (8bitbubsy)
 The folks over at WinUAE
 The folks over at Cloanto/Amiga Forever
 And, of course, to Commodore themselves
+</pre>
