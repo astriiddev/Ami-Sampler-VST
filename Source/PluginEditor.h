@@ -65,6 +65,8 @@ private:
     int currentSample = 0;
     int lastLowKey = 24, lastHighkey = 124;
     int baseOctave = 5, asciiNote = 60, currMidiChannel = 1;
+    int lastPos = 0, lastPosLine = 0;
+
     uint32_t scrollcolor = UINT32_MAX;
 
     juce::ImageComponent logoImage;
@@ -90,6 +92,9 @@ private:
         0x0B, 0x00, 0x0E, 0x0C, 0x0A, 0x1B, 0x1D, 0x0D, 0x12, 0x02,
         0x14, 0x18, 0x06, 0x0F, 0x03, 0x16, 0x01, 0x1E, 0x22, 0x20
     };
+
+    uint8_t keysPressed[50]{};
+
     bool keyPressed(const juce::KeyPress&) override;
     bool keyStateChanged(bool isKeyDown) override;
     void handleExtraNoteOn(const int note);
