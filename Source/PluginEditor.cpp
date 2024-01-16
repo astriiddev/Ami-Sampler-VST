@@ -16,7 +16,7 @@ AmiAudioProcessorEditor::AmiAudioProcessorEditor (AmiAudioProcessor& p)
     : AudioProcessorEditor (&p), handleGui(p), keyboardComponent(p.getKeyState(), juce::MidiKeyboardComponent::horizontalKeyboard),
        audioProcessor (p)
 {
-    juce::LookAndFeel::setDefaultLookAndFeel(&lookNFeel);
+    setLookAndFeel(&lookNFeel);
     setScaleFactor(audioProcessor.getCurrentScaleFactor());
     lookNFeel.setMouseCursorSize(audioProcessor.getCurrentScaleFactor());
 
@@ -96,6 +96,8 @@ AmiAudioProcessorEditor::AmiAudioProcessorEditor (AmiAudioProcessor& p)
 
     audioProcessor.getMidiCollector().reset(audioProcessor.getDevSampleRate());
 
+    juce::zeromem(keysPressed, 50);
+  
     startTimer(80);
     setSize (1080, 640);
 }
@@ -108,7 +110,7 @@ AmiAudioProcessorEditor::~AmiAudioProcessorEditor()
         audioProcessor.getAPVTS().removeParameterListener(lpAtch, this);
     }
 
-    juce::LookAndFeel::setDefaultLookAndFeel(nullptr);
+    setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -495,6 +497,8 @@ bool AmiAudioProcessorEditor::keyPressed(const juce::KeyPress& k)
 
     if (asciiNote == 0)  return true;
         
+    keysPressed[key - ','] = 1;
+  
     handleExtraNoteOn(asciiNote - 1);
 
     return true;
@@ -506,9 +510,14 @@ bool AmiAudioProcessorEditor::keyStateChanged(bool isKeyDown)
 
     for (char c = ','; c <= ']'; c++)
     {
-        asciiNote = keyPress2Note[c - ','];
-        if (!juce::KeyPress::isKeyCurrentlyDown(c))
+        const  char key = c - ',';
+
+        asciiNote = keyPress2Note[key];
+        if (!juce::KeyPress::isKeyCurrentlyDown(c) && keysPressed[key])
+        {
             handleExtraNoteOff(asciiNote - 1);
+            keysPressed[key] = 0;
+        }
     }
 
     return true;
@@ -597,7 +606,6 @@ void AmiAudioProcessorEditor::drawWaveMenu()
     waveMenu.copyPixelBuffer();
 }
 
-static int lastPos = 0, lastPosLine = 0;
 void AmiAudioProcessorEditor::timerCallback()
 {
     const int samplePos = audioProcessor.getSamplePos();
