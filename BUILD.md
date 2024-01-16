@@ -1,4 +1,4 @@
-
+<pre>
 
           ╓────────────────────────────╖
           ║                            ║
@@ -139,6 +139,8 @@ On Linux:
    for faster access (typing just "ami" into the command line
    will then open the standalone app.
 
+═══════════════════════════════════════════════════════════════════
+
 Additonally, there are four directories of samples available
 for optional download. In addition to the famous ST-01 and
 ST-02 sample packs, I included a handful of my favorite
@@ -162,3 +164,4 @@ Olav Sørensen (8bitbubsy)
 The folks over at WinUAE
 The folks over at Cloanto/Amiga Forever
 And, of course, to Commodore themselves
+</pre>
