@@ -75,3 +75,10 @@ Ami Sampler has been tested and working on the following.
 - As a VST3 in Ardour 8
 - As an LV2 in Ardour 8
 - As an LV2 in MusE
+
+# Special thanks to
+
+ - Olav Sørensen (8bitbubsy)
+ - The folks over at WinUAE
+ - The folks over at Cloanto/Amiga Forever
+ - And, of course, to Commodore themselves
