@@ -49,6 +49,8 @@ Sample loading can be done via the LOAD button or by dragging and dropping sampl
 
 A handleful of samples are included in this repository under the Samples folder. Included are the famous ST-01 and ST-02 sample packs converted to WAV, a random collection of some of my favorite samples in the remaining ST-XX sample packs (under ST-FV), and a handful of samples that I recorded on my Amiga 500 using my Arduinosound Turbo sampler module (https://github.com/astriiddev/Arduinosound-Turbo) under the folder ST-ASTRX. Some of the ST-ASTRX samples are in the original IFF format, some have been converted to BRR using my SBC700 Super BRR Converter program (still in development).
 
+Additional Amiga samples from the ST-XX sample packs can be found at https://archive.org/details/AmigaSTXX
+
 Sample saving is done with the SAVE button; currently only WAV, AIF, IFF, raw, and BIN are supported. You can also clear out a sample from its slot with the trashcan icon.
 
 # Things to add, bugs to fix
