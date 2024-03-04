@@ -120,7 +120,7 @@ void NewSamplerVoice::startNote (int midiNoteNumber, float velocity, juce::Synth
 
         numVoices = audioProcessor.getSampler(currentSample).getNumVoices();
 
-        bendRatio = 1. + (double)(pitchwheel - 8192) / (4096.0 * 12.0);
+        bendRatio = std::pow(2., ((double) newValue - 8192.0) / 49152.0);
         fineTune = audioProcessor.getFineTune(currentSample) / 1200.;
 
         pitchTarget = std::pow(2.0, (double)(midiNoteNumber - sound->midiRootNote) / 12.0) 
@@ -171,7 +171,7 @@ void NewSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
 
 void NewSamplerVoice::pitchWheelMoved(int newValue)
 {
-    bendRatio = 1. + (double)(newValue - 8192) / (4096.0 * 12.0);
+    bendRatio = std::pow(2., ((double) newValue - 8192.0) / 49152.0);
 }
 
 void NewSamplerVoice::controllerMoved (int /*controllerNumber*/, int /*newValue*/) {}
