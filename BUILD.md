@@ -11,74 +11,26 @@ These instructions are for building Ami Sampler from the
 source files. For instructions on installing the already 
 made application and VST files, see INSTALL.
 
+Version 0.6 required a juce_patch in order to build.
+This is no longer needed as JUCE has fixed the issues
+in juce_Windows_windowing.cpp and I've rewritten the
+extra formats to no longer require a patch. The extra
+formats are now located in Source/astro_formats. If you
+built v0.6, it is recommended that you remove the patch
+and build with the current JUCE source.
+
 ═══════════════════╕
     DEPENDENCIES:  │
 ═══════════════════╛
 
 1. Download or build JUCE framework
-2. Download juce_patch.zip from AmiSampler repo
-3. Install build tools for your platform
+2. Install build tools for your platform
    - For Windows: Visual Studio 2022
    - For MacOS: Xcode 15
    - For Linux: GCC/G++ (sudo apt install build-essential 
                             or sudo pacman -Sy base-devel)
-4. [OPTIONAL] Download the Samples directory and its
+3. [OPTIONAL] Download the Samples directory and its
    subdirectories
-
-═══════════════════╕ 
-   PATCHING JUCE:  │ 
-═══════════════════╛ 
-
-The Ami Sampler makes a few changes to the JUCE 
-source code and therefore requires a handful of files for
-patching JUCE to build it. One patch fixes a bug in Windows
-for detecting the key state for the \ and = keys which is
-needed for having the computer-key to MIDI note map function
-properly. The other patch adds support for IFF/raw, BRR, and
-BIN files. This can be patched manually or with either the
-.bat or .ps1 scripts
-
-To manually patch:
-
-1. Unzip the juce_patch.zip file.
-2. Move the following files within the juce_patch directory
-   into the respective directories.
-
-in (JUCE_DIR)\modules\juce_gui_basics\native :
-     juce_patch\juce_Windowing_windows.cpp
-
-in (JUCE_DIR)\modules\juce_audio_formats :
-
-     juce_patch\astro_fmt\juce_audio_formats.cpp
-     juce_patch\astro_fmt\juce_audio_formats.h
-
-in (JUCE_DIR)\modules\juce_audio_formats\format :
-
-    juce_patch\astro_fmt\format\juce_AudioFormatManager.cpp
-    juce_patch\astro_fmt\format\juce_AudioFormatManager.h
-
-in (JUCE_DIR)\modules\juce_audio_formats\codecs :
-
-    juce_patch\astro_fmt\codecs\astro_BrrAudioFormat.cpp
-    juce_patch\astro_fmt\codecs\astro_BrrAudioFormat.h
-    juce_patch\astro_fmt\codecs\astro_IffAudioFormat.cpp
-    juce_patch\astro_fmt\codecs\astro_IffAudioFormat.h
-    juce_patch\astro_fmt\codecs\astro_MuLawFormat.cpp
-    juce_patch\astro_fmt\codecs\astro_MuLawFormat.h
-
-where (JUCE_DIR) is the location of your JUCE directory.
-
-To patch with a script:
-
-   On any platform with Powershell support, run:
-      juce_patch\astro_fmt.ps1 [JUCE_DIR]
-
-   Windows typically requires extra permissions for .ps1 
-   files, so instead run:
-      juce_patch\astro_fmt.bat [JUCE_DIR]
-
-where [JUCE_DIR\ is the location of your JUCE directory.
-
 
 ═══════════════════╕
     BUILDING AMI:  │
@@ -122,8 +74,15 @@ On MacOS:
 
 On Linux:
 
-   OPTIONAL: select LV2 as a type while in the Projucer 
+   OPTIONAL 1: select LV2 as a type while in the Projucer 
    window and save the ami.jucer file.
+
+   OPTIONAL 2: the waveform in Ami Sampler can be scrolled
+   left-to-right with a laptop trackpad when the waveform is
+   zoomed in. However, JUCE in Linux does not have the
+   necessary code to allow for this. Please see my write-up at:
+          https://forum.juce.com/t/no-horizontal-scrolling-in-x11/60584
+   to add this in.
 
    In the terminal, navigate to Builds/LinuxMakeFile in the
    project directory and type 
