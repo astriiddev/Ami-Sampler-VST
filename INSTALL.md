@@ -18,9 +18,8 @@ on building from the source, see BUILD.
 1. Navigate to the Releases page on the Ami Sampler github
    repository at https://github.com/astriiddev/Ami-Sampler/releases
 2. Download AmiSampler_win_x86_64.7z and extract the contents
-3. Move ami.vst3 to your VST3 folder; typically 
-   C:\Program Files\Common Files\VST3
-4. Move ami.exe to the folder of your choice
+3. Either run install.bat to move ami.vst to the standard VST3 directory
+   and create a Start Menu shortcut for ami.exe or manually do these.
 
 ═══════════════════╕
     ON MACOS:      │
@@ -51,7 +50,7 @@ For manual installation:
 
 1. Navigate to the Releases page on the Ami Sampler github
    repository at https://github.com/astriiddev/Ami-Sampler/releases
-2. Download AmiSampler_linux.7z and extract its contents
+2. Download AmiSampler_linux_x86_64.7z and extract its contents
 
 For automatic installation:
 
