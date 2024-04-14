@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="xWQlG7" name="Ami Sampler" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              pluginVST3Category="Instrument,Sampler" pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
+              pluginManufacturer="_astriid_" defines="JUCE_MODAL_LOOPS_PERMITTED=0&#10;JUCE_WAV_DO_NOT_PAD_HEADER_SIZE=1"
+              lv2Uri="https://lv2plug.in/ns/ext/urid/AmiSampler" pluginFormats="buildStandalone,buildVST3">
+  <MAINGROUP id="Ijfsy3" name="Ami Sampler">
+    <GROUP id="{C7AD4387-7952-6AD4-EE7D-472A6827E160}" name="Res">
+      <FILE id="scUhL1" name="AmiLogo.png" compile="0" resource="1" file="Res/AmiLogo.png"/>
+      <FILE id="gpZ8yt" name="amidos.ttf" compile="0" resource="1" file="Res/amidos.ttf"/>
+      <FILE id="XKQePS" name="amiMouseCursor.png" compile="0" resource="1"
+            file="Res/amiMouseCursor.png"/>
+      <FILE id="eNSTf3" name="amiwin1_1.png" compile="0" resource="1" file="Res/amiwin1_1.png"/>
+      <FILE id="FL52KT" name="amiwin1_2.png" compile="0" resource="1" file="Res/amiwin1_2.png"/>
+      <FILE id="zPDLBx" name="amiwin2_1.png" compile="0" resource="1" file="Res/amiwin2_1.png"/>
+      <FILE id="OLUmEH" name="amiwin2_2.png" compile="0" resource="1" file="Res/amiwin2_2.png"/>
+      <FILE id="iznv4X" name="amiwin3_1.png" compile="0" resource="1" file="Res/amiwin3_1.png"/>
+      <FILE id="GKFpa5" name="amiwin3_2.png" compile="0" resource="1" file="Res/amiwin3_2.png"/>
+      <FILE id="pc5ztF" name="pixelkey_black.png" compile="0" resource="1"
+            file="Res/pixelkey_black.png"/>
+      <FILE id="FlCjEb" name="amiTrashOff.png" compile="0" resource="1" file="Res/amiTrashOff.png"/>
+      <FILE id="Tn8ThD" name="amiTrashOn.png" compile="0" resource="1" file="Res/amiTrashOn.png"/>
+      <FILE id="WF6Ms3" name="astriid_amiga.png" compile="0" resource="1"
+            file="Res/astriid_amiga.png"/>
+    </GROUP>
+    <GROUP id="{1878A54D-BA5B-92E5-C43C-7D561C0BB03F}" name="Source">
+      <GROUP id="{C8ED1F9A-6D34-4C3E-DE33-CA360CA0647A}" name="astro_formats">
+        <FILE id="h2VlCJ" name="astro_BrrAudioFormat.cpp" compile="1" resource="0"
+              file="Source/astro_formats/astro_BrrAudioFormat.cpp"/>
+        <FILE id="NTRv48" name="astro_BrrAudioFormat.h" compile="0" resource="0"
+              file="Source/astro_formats/astro_BrrAudioFormat.h"/>
+        <FILE id="iz6qDN" name="astro_IffAudioFormat.cpp" compile="1" resource="0"
+              file="Source/astro_formats/astro_IffAudioFormat.cpp"/>
+        <FILE id="CfulvX" name="astro_IffAudioFormat.h" compile="0" resource="0"
+              file="Source/astro_formats/astro_IffAudioFormat.h"/>
+        <FILE id="uqZYlZ" name="astro_MuLawFormat.cpp" compile="1" resource="0"
+              file="Source/astro_formats/astro_MuLawFormat.cpp"/>
+        <FILE id="GoRgSv" name="astro_MuLawFormat.h" compile="0" resource="0"
+              file="Source/astro_formats/astro_MuLawFormat.h"/>
+      </GROUP>
+      <FILE id="k9AHkI" name="AmiWindowEditor.cpp" compile="1" resource="0"
+            file="Source/AmiWindowEditor.cpp"/>
+      <FILE id="ke6GVJ" name="AmiWindowEditor.h" compile="0" resource="0"
+            file="Source/AmiWindowEditor.h"/>
+      <FILE id="N8sO6x" name="AmiAlertWindow.cpp" compile="1" resource="0"
+            file="Source/AmiAlertWindow.cpp"/>
+      <FILE id="YsZqdA" name="AmiAlertWindow.h" compile="0" resource="0"
+            file="Source/AmiAlertWindow.h"/>
+      <FILE id="MLlIAE" name="ami_font.cpp" compile="1" resource="0" file="Source/ami_font.cpp"/>
+      <FILE id="cTJ4WU" name="ami_font.h" compile="0" resource="0" file="Source/ami_font.h"/>
+      <FILE id="T2MtPh" name="ami_palette.h" compile="0" resource="0" file="Source/ami_palette.h"/>
+      <FILE id="rSPmnw" name="GuiComponent.h" compile="0" resource="0" file="Source/GuiComponent.h"/>
+      <FILE id="HOPHLe" name="GuiComponent.cpp" compile="1" resource="0"
+            file="Source/GuiComponent.cpp"/>
+      <FILE id="LPHRgs" name="AmiLookAndFeel.cpp" compile="1" resource="0"
+            file="Source/AmiLookAndFeel.cpp"/>
+      <FILE id="b4uuYd" name="AmiLookAndFeel.h" compile="0" resource="0"
+            file="Source/AmiLookAndFeel.h"/>
+      <FILE id="zsijAk" name="TrackerKeyboardComponent.h" compile="0" resource="0"
+            file="Source/TrackerKeyboardComponent.h"/>
+      <FILE id="se5rF5" name="AmiSamplerSound.h" compile="0" resource="0"
+            file="Source/AmiSamplerSound.h"/>
+      <FILE id="Y2xydL" name="AmiSamplerSound.cpp" compile="1" resource="0"
+            file="Source/AmiSamplerSound.cpp"/>
+      <FILE id="smmufY" name="PixelBuffer.cpp" compile="1" resource="0" file="Source/PixelBuffer.cpp"/>
+      <FILE id="MIkFJM" name="PixelBuffer.h" compile="0" resource="0" file="Source/PixelBuffer.h"/>
+      <FILE id="CUD6cV" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="yX0cQV" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="S6ZLID" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="ftrTqx" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+      <FILE id="WhiO7d" name="RCFilters.cpp" compile="1" resource="0" file="Source/RCFilters.cpp"/>
+      <FILE id="PaRzF4" name="RCFilters.h" compile="0" resource="0" file="Source/RCFilters.h"/>
+      <FILE id="wExhh0" name="SliderComponent.cpp" compile="1" resource="0"
+            file="Source/SliderComponent.cpp"/>
+      <FILE id="uxCoQs" name="SliderComponent.h" compile="0" resource="0"
+            file="Source/SliderComponent.h"/>
+    </GROUP>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
+  <EXPORTFORMATS>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" recommendedWarnings="GCC" extraCompilerFlags="-Wall -Wpedantic -Wextra"/>
+        <CONFIGURATION isDebug="0" name="Release" optimisation="5"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_utils" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
+        <MODULEPATH id="juce_core" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
+        <MODULEPATH id="juce_data_structures" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
+        <MODULEPATH id="juce_events" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
+        <MODULEPATH id="juce_graphics" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+    <VS2022 targetFolder="Builds/VisualStudio2022" smallIcon="scUhL1" bigIcon="scUhL1">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" enablePluginBinaryCopyStep="1" vst3BinaryLocation="C:\Program Files\Common Files\VST3\_astriid_"
+                       targetName="ami"/>
+        <CONFIGURATION isDebug="0" name="Release" optimisation="4" targetName="ami"
+                       enablePluginBinaryCopyStep="1" vst3BinaryLocation="C:\Program Files\Common Files\VST3\_astriid_"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../juce"/>
+        <MODULEPATH id="juce_audio_devices" path="../../juce"/>
+        <MODULEPATH id="juce_audio_formats" path="../../juce"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../juce"/>
+        <MODULEPATH id="juce_audio_processors" path="../../juce"/>
+        <MODULEPATH id="juce_audio_utils" path="../../juce"/>
+        <MODULEPATH id="juce_core" path="../../juce"/>
+        <MODULEPATH id="juce_data_structures" path="../../juce"/>
+        <MODULEPATH id="juce_events" path="../../juce"/>
+        <MODULEPATH id="juce_graphics" path="../../juce"/>
+        <MODULEPATH id="juce_gui_basics" path="../../juce"/>
+        <MODULEPATH id="juce_gui_extra" path="../../juce"/>
+      </MODULEPATHS>
+    </VS2022>
+    <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="scUhL1" bigIcon="scUhL1">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release" optimisation="5"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="C:\Dev\clones\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="C:\Dev\clones\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="C:\Dev\clones\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="C:\Dev\clones\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="C:\Dev\clones\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_utils" path="C:\Dev\clones\JUCE\modules"/>
+        <MODULEPATH id="juce_core" path="C:\Dev\clones\JUCE\modules"/>
+        <MODULEPATH id="juce_data_structures" path="C:\Dev\clones\JUCE\modules"/>
+        <MODULEPATH id="juce_events" path="C:\Dev\clones\JUCE\modules"/>
+        <MODULEPATH id="juce_graphics" path="C:\Dev\clones\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="C:\Dev\clones\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="C:\Dev\clones\JUCE\modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+  </EXPORTFORMATS>
+</JUCERPROJECT>
