@@ -18,11 +18,7 @@
 class TrackerKeyboardComponent  : public juce::MidiKeyboardComponent
 {
 public:
-<<<<<<< HEAD
     TrackerKeyboardComponent(juce::MidiKeyboardState& keyState, Orientation midiOrientation) : MidiKeyboardComponent(keyState, midiOrientation)
-=======
-    TrackerKeyboardComponent(juce::MidiKeyboardState& state, Orientation orientation) :MidiKeyboardComponent(state, orientation)
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     {
         setRepaintsOnMouseActivity(false);
         pixelkey_black = juce::ImageCache::getFromMemory(BinaryData::pixelkey_black_png, BinaryData::pixelkey_black_pngSize);

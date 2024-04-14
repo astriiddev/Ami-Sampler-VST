@@ -17,14 +17,10 @@
 //==============================================================================
 /**
 */
-<<<<<<< HEAD
 
 class GuiComponent  : public juce::Component,
                       public juce::Button::Listener,
                       public juce::AudioProcessorValueTreeState::Listener
-=======
-class GuiComponent  : public juce::Component
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 {
 public:
     GuiComponent(AmiAudioProcessor&);
@@ -37,7 +33,6 @@ public:
     void mouseDown(const juce::MouseEvent&) override;
     void mouseUp(const juce::MouseEvent&) override;
 
-<<<<<<< HEAD
     void showMoreOptions(const bool& show);
     void changeSampleChannel(const int& channel);
 
@@ -72,28 +67,6 @@ private:
 
     /* Text Buttons */
     juce::TextButton enableLoop{ "LOOP" }, paulaStereo{ "PAULA" };
-=======
-    bool& wasDiskOpClicked() { return diskOpClicked; }
-
-private:
-
-    void initLabel(juce::Label*, const bool);
-    void initButton(juce::Button*, const bool);
-
-    void automateLoopText(juce::Label*, const int);
-
-    juce::Rectangle<int> ledRectangle;
-
-    juce::Label startLoopText, endLoopText, replenLoopText, 
-                sampleMidiChannel, midiRootNote, midiLowNote, midiHiNote;
-
-    juce::ToggleButton muteBox, soloBox, 
-                       monoBox, ptpolyBox, octapolyBox;
-
-    /* Text Buttons */
-    juce::TextButton enableLoop{ "LOOP" }, modelType{ "A500 FILTER" }, 
-                     ledFilter{ "LED FILTER" }, paulaStereo{ "PAULA" };
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> ledAttachment,  modelAttachment,
                                                                           loopAttachment, paulaAttachment;
@@ -118,14 +91,8 @@ private:
                                  "C8",  "C#8",  "D8",  "D#8",  "E8",  "F8",  "F#8",  "G8" };
 
     int numVoiceState{ 0 }, currentSample = 0, lastSample = -1;
-<<<<<<< HEAD
     bool showExtendedOptions = false, textInHex = true;
 
-=======
-    bool stereoState{ false };
-    bool diskOpClicked{ false };
-    
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     const juce::Rectangle<int> waveBox{ 0, 0, 810, 320 };
     const juce::Rectangle<int> windowRect[21]
     {
@@ -160,10 +127,6 @@ private:
       { waveBox.getRight() - 20, waveBox.getBottom() - 22, 17, 19 }
     };
 
-<<<<<<< HEAD
-=======
-    
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     AmiAudioProcessor& audioProcessor;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuiComponent)
 };

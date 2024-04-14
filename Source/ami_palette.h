@@ -8,19 +8,12 @@
   ==============================================================================
 */
 
-<<<<<<< HEAD
 #include <JuceHeader.h>
 
 #ifndef __AMI_PALETTE_H
 #define __AMI_PALETTE_H
 
 #define JPAL(c)   juce::Colour((juce::uint32) (c))
-=======
-#ifndef __AMI_PALETTE_H
-#define __AMI_PALETTE_H
-
-#define JPAL(c)   juce::Colour(c)
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 
 constexpr uint32_t AMI_BLU = 0xFF0054AA;
 constexpr uint32_t AMI_BLL = 0xFF006ADD;

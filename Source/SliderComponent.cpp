@@ -21,13 +21,8 @@ SliderComponent::SliderComponent(AmiAudioProcessor& p) : audioProcessor(p)
 
     for (int i = 0; i < 12; i++)
     {
-<<<<<<< HEAD
         audioProcessor.getAPVTS().addParameterListener("PAULA STEREO" + juce::String(i), this);
         audioProcessor.getAPVTS().addParameterListener("MONO POLY" + juce::String(i), this);
-=======
-        const juce::String plaAtch = "PAULA STEREO" + juce::String(i);
-        audioProcessor.getAPVTS().addParameterListener(plaAtch, this);
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     }
 }
 
@@ -35,22 +30,15 @@ SliderComponent::~SliderComponent()
 {
     for (int i = 0; i < 12; i++)
     {
-<<<<<<< HEAD
         audioProcessor.getAPVTS().removeParameterListener("PAULA STEREO" + juce::String(i), this);
         audioProcessor.getAPVTS().removeParameterListener("MONO POLY" + juce::String(i), this);
     }
 
     sampleRateSlider.removeListener(this);
-=======
-        const juce::String plaAtch = "PAULA STEREO" + juce::String(i);
-        audioProcessor.getAPVTS().removeParameterListener(plaAtch, this);
-    }
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 }
 
 void SliderComponent::paint (juce::Graphics& g)
 {
-<<<<<<< HEAD
     if(hideChannelSliders) 
     {
         if(sampleRateSlider.getThumbBeingDragged() < 0)
@@ -63,94 +51,6 @@ void SliderComponent::paint (juce::Graphics& g)
         g.drawText("Fine Tune", juce::Rectangle(proportionOfWidth(0.72f), proportionOfHeight(0.684f), 
             proportionOfWidth(0.15f), proportionOfHeight(0.05f)), juce::Justification::centredTop, false);
     }
-=======
-    currentSample = audioProcessor.getCurrentSample();
-    const juce::String currentSampleAtch = juce::String(currentSample);
-    const juce::String currentSampleLbl = juce::String(currentSample + 1).paddedLeft('0', 2);
-
-    g.setFont(getLookAndFeel().getLabelFont(downSampleLabel));
-    
-    if(currentSample != lastSample)
-    {
-        const bool stereoOn = audioProcessor.paulaStereoOn(currentSample);
-        const juce::String chanPanLbl = !stereoOn ? "Chan " + currentSampleLbl + "\nPanning" :
-            "Chan " + currentSampleLbl + "\nWidth";
-
-        const juce::String chanPanAtch = !stereoOn ? "CHANNEL PAN" + currentSampleAtch :
-            "CHANNEL WIDTH" + currentSampleAtch;
-
-        channelPanAttachment.reset();
-        channelPanLabel.setText(chanPanLbl, juce::NotificationType::dontSendNotification);
-        channelPanAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-            (audioProcessor.getAPVTS(), chanPanAtch, channelPanSlider);
-
-        lastSample = currentSample;
-    }
-
-    const juce::String chanVolLbl = "Chan " + currentSampleLbl + "\nVolume";
-    const juce::String chanVolAtch = "CHANNEL VOLUME" + currentSampleAtch;
-
-    const juce::String snhAtch = "SAMP N HOLD" + currentSampleAtch;
-    const juce::String glsAtch = "CHANNEL GLISS" + currentSampleAtch;
-    const juce::String tuneAtch = "FINE TUNE" + currentSampleAtch;
-
-    const juce::String attackAtch = "ATTACK" + currentSampleAtch;
-    const juce::String decayAtch = "DECAY" + currentSampleAtch;
-    const juce::String sustainAtch = "SUSTAIN" + currentSampleAtch;
-    const juce::String releaseAtch = "RELEASE" + currentSampleAtch;
-
-    channelVolAttachment.reset();
-
-    downSampleAttachment.reset();
-    glissandoAttachment.reset();
-
-    fineTuneAttachment.reset();
-
-    attackAttachment.reset();
-    decayAttachment.reset();
-    sustainAttachment.reset();
-    releaseAttachment.reset();
-
-    if (glissandoSlider.isEnabled() && audioProcessor.getSampler(currentSample).getNumVoices() > 1)
-    {
-        glissandoSlider.setEnabled(false);
-        glissandoLabel.setColour(juce::Label::textColourId, juce::Colour(0xA0DDDDDD));
-        glissandoSlider.setColour(juce::Slider::thumbColourId, juce::Colours::lightslategrey);
-    }
-    else if (!glissandoSlider.isEnabled() && audioProcessor.getSampler(currentSample).getNumVoices() == 1)
-    {
-        glissandoSlider.setEnabled(true);
-        glissandoLabel.setColour(juce::Label::textColourId, juce::Colours::white);
-        glissandoSlider.setColour(juce::Slider::thumbColourId, juce::Colours::white);
-    }
-
-    channelVolLabel.setText(chanVolLbl, juce::NotificationType::dontSendNotification);
-    channelVolAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-        (audioProcessor.getAPVTS(), chanVolAtch, channelVolSlider);
-
-    downSampleAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-        (audioProcessor.getAPVTS(), snhAtch, downSampleSlider);
-
-    glissandoAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-        (audioProcessor.getAPVTS(), glsAtch, glissandoSlider);
-
-    fineTuneAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-        (audioProcessor.getAPVTS(), tuneAtch, fineTuneSlider);
-
-    attackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-        (audioProcessor.getAPVTS(), attackAtch, attackSlider);
-    decayAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-        (audioProcessor.getAPVTS(), decayAtch, decaySlider);
-    sustainAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-        (audioProcessor.getAPVTS(), sustainAtch, sustainSlider);
-    releaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-        (audioProcessor.getAPVTS(), releaseAtch, releaseSlider);
-
-    g.setColour(juce::Colours::white);
-    g.drawText("Fine Tune", juce::Rectangle(proportionOfWidth(0.72f), proportionOfHeight(0.684f), 
-        proportionOfWidth(0.15f), proportionOfHeight(0.05f)), juce::Justification::centredTop, false);
-
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 }
 
 void SliderComponent::resized()
@@ -171,15 +71,11 @@ void SliderComponent::resized()
 
     downSampleSlider.setBoundsRelative(0.52f, 0.513f, 0.15f, 0.05f);
     glissandoSlider.setBoundsRelative(0.52f, 0.563f, 0.15f, 0.05f);
-<<<<<<< HEAD
     sampleRateSlider.setBoundsRelative(0.47f, 0.563f, 0.2f, 0.05f);
-=======
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 
     fineTuneSlider.setBoundsRelative(0.72f, 0.632f, 0.15f, 0.05f);
 }
 
-<<<<<<< HEAD
 void SliderComponent::hideSliders(const bool hide)
 {
     const bool show = !hide;
@@ -246,34 +142,11 @@ void SliderComponent::initSliders()
     initSlider(&masterPanSlider, &masterPanLabel, "Master\nPanning", "MASTER PAN", &masterPanAttachment);
     initSlider(&vibeSpeedSlider, &vibeSpeedLabel, "Vibe\nSpeed", "VIBRATO SPEED", &vibeSpeedAttachment);
     initSlider(&vibeIntstySlider, &vibeIntstyLabel, "Vibe\nAmount", "VIBRATO INTENSITY", &vibeIntstyAttachment);
-=======
-void SliderComponent::initSliders()
-{
-    initSlider(&masterVolSlider, &masterVolLabel, "Master\nVolume");
-    masterVolAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-        (audioProcessor.getAPVTS(), "MASTER VOLUME", masterVolSlider);
-
-    initSlider(&masterPanSlider, &masterPanLabel, "Master\nPanning");
-    masterPanAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-        (audioProcessor.getAPVTS(), "MASTER PAN", masterPanSlider);
-
-    initSlider(&vibeSpeedSlider, &vibeSpeedLabel, "Vibe\nSpeed");
-    vibeSpeedAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-        (audioProcessor.getAPVTS(), "VIBRATO SPEED", vibeSpeedSlider);
-
-    initSlider(&vibeIntstySlider, &vibeIntstyLabel, "Vibe\nAmount");
-    vibeIntstyAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-        (audioProcessor.getAPVTS(), "VIBRATO INTENSITY", vibeIntstySlider);
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 
     initSlider(&channelVolSlider, &channelVolLabel, "");
     initSlider(&channelPanSlider, &channelPanLabel, "");
 
-<<<<<<< HEAD
     initSlider(&downSampleSlider, &downSampleLabel, "Sample\n& Hold");
-=======
-    initSlider(&downSampleSlider, &downSampleLabel, "Down\nSample");
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     initSlider(&glissandoSlider, &glissandoLabel, "Glide");
     initSlider(&fineTuneSlider, nullptr, "");
 
@@ -281,7 +154,6 @@ void SliderComponent::initSliders()
     initSlider(&decaySlider, &decayLabel, "Decay");
     initSlider(&sustainSlider, &sustainLabel, "Sustain");
     initSlider(&releaseSlider, &releaseLabel, "Release");
-<<<<<<< HEAD
 
     initSlider(&sampleRateSlider, &sampleRateLabel, "Chan Sample Rate");
     sampleRateLabel.attachToComponent(&sampleRateSlider, false);
@@ -291,19 +163,14 @@ void SliderComponent::initSliders()
     sampleRateSlider.setRange(1000.0, 48000.0, 1.0);
     sampleRateSlider.setValue(audioProcessor.getSourceSampleRate(currentSample), juce::NotificationType::dontSendNotification);
     sampleRateSlider.setVisible(false);
-=======
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 }
 
 void SliderComponent::initSlider(juce::Slider* s, juce::Label* l, const juce::String name)
 {
     const float fontHeight = name.containsChar('\n') || name.isEmpty() ? 14.f : 16.f;
 
-<<<<<<< HEAD
     jassert(s != nullptr);
 
-=======
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     addAndMakeVisible(*s);
     s->setScrollWheelEnabled(false);
     s->setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
@@ -320,7 +187,6 @@ void SliderComponent::initSlider(juce::Slider* s, juce::Label* l, const juce::St
     l->setText(name, juce::NotificationType::dontSendNotification);
 }
 
-<<<<<<< HEAD
 void SliderComponent::initSlider(juce::Slider *s, juce::Label *l, const juce::String &name, const juce::String &id, 
                                  std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> *attachment)
 {
@@ -395,25 +261,4 @@ void SliderComponent::changePanWidth(const bool stereoOn, const juce::String& cu
     }
 
     attachSlider(&channelPanSlider, &channelPanLabel, panLbl, panAtch, &channelPanAttachment);
-=======
-void SliderComponent::parameterChanged(const juce::String& parameterID, float newValue)
-{
-    const juce::String currentSampleAtch = juce::String(currentSample);
-    const juce::String currentSampleLbl = juce::String(currentSample + 1).paddedLeft('0', 2);
-    const juce::String plaAtch = "PAULA STEREO" + currentSampleAtch;
-
-    if (parameterID.containsIgnoreCase(plaAtch))
-    {
-        const juce::String chanPanLbl = newValue == 0.0 ? "Chan " + currentSampleLbl + "\nPanning" :
-                                                          "Chan " + currentSampleLbl + "\nWidth";
-
-        const juce::String chanPanAtch = newValue == 0.0 ? "CHANNEL PAN"   + currentSampleAtch :
-                                                           "CHANNEL WIDTH" + currentSampleAtch;
-
-        channelPanAttachment.reset();
-        channelPanLabel.setText(chanPanLbl, juce::NotificationType::dontSendNotification);
-        channelPanAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
-            (audioProcessor.getAPVTS(), chanPanAtch, channelPanSlider);
-    }
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 }

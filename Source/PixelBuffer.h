@@ -22,11 +22,7 @@ typedef struct Rect_t
         w,
         h;
 
-<<<<<<< HEAD
     uint32_t c;
-=======
-    int c;
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 } Rect_t;
 
 class PixelBuffer  : public juce::Component
@@ -59,7 +55,6 @@ public:
 
     void resetZoom();
 
-<<<<<<< HEAD
     void draw_line(const int x1, const int y1, const int x2, const int y2, const uint32_t c);
     void draw_Hline(const int x, const int y, const int w, const uint32_t c);
     void draw_Vline(const int x, const int y, const int h, const uint32_t c);
@@ -69,17 +64,6 @@ public:
 
     void print_font(char text, int x, int y, uint32_t color, int size);
     void print_string(const char* text, int x, int y, uint32_t c, int size);
-=======
-    void draw_line(const int x1, const int y1, const int x2, const int y2, const int c);
-    void draw_Hline(const int x, const int y, const int w, const int c);
-    void draw_Vline(const int x, const int y, const int h, const int c);
-
-    void draw_rect(const int x, const int y, const int w, const int h, const int c);
-    void fill_rect(const int x, const int y, const int w, const int h, const int c);
-
-    void print_font(char text, int x, int y, int color, int size);
-    void print_string(const char* text, int x, int y, int c, int size);
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 
     inline void setSamplePos(const int pos) { sample_pos = pos > 0 ? pos < samp_len ? pos : 0 : 0; }
     inline int& getPosLine() { return posLine; }
@@ -124,10 +108,6 @@ private:
     uint32_t* pixel_pointer = nullptr;
     juce::Array<uint32_t> pixel_buffer;
     juce::Array <int16_t> pixelWave;
-<<<<<<< HEAD
-=======
-    //int* point_x = nullptr; 
->>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     juce::Array<int> point_x, point_y;
 
     int64_t samp2wave_scale = 0, wave2samp_scale = 0;
