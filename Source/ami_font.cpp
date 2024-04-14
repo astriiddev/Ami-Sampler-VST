@@ -121,4 +121,8 @@ const unsigned char* font[94] =
         font_lbrce, font_vline, font_rbrce, font_tilde
 };
 
+<<<<<<< HEAD
 const unsigned char& getAmiFont(int letter, int bit) { return font[letter][bit]; }
+=======
+const unsigned char& getFont(int letter, int bit) { return font[letter][bit]; }
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895

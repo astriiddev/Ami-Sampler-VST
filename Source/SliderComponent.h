@@ -17,7 +17,10 @@
 /*
 */
 class SliderComponent  : public juce::Component,
+<<<<<<< HEAD
                          public juce::Slider::Listener,
+=======
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
                          public juce::AudioProcessorValueTreeState::Listener
 {
 public:
@@ -27,6 +30,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+<<<<<<< HEAD
     void hideSliders(const bool hide);
     void changeSampleChannel(const int& channel);
     void enableGliss(const bool enable);
@@ -45,20 +49,36 @@ private:
 
     int currentSample = 0, lastSample = -1;
     bool hideChannelSliders = false;
+=======
+private:
+    void initSliders();
+    void initSlider(juce::Slider*, juce::Label*, const juce::String);
+    void parameterChanged(const juce::String& parameterID, float newValue) override;
+
+    int currentSample = 0, lastSample = -1;
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 
     juce::Slider masterVolSlider,  masterPanSlider,
                  vibeSpeedSlider, vibeIntstySlider,
                  channelVolSlider, channelPanSlider,
                  downSampleSlider, glissandoSlider, fineTuneSlider,
+<<<<<<< HEAD
                  attackSlider, decaySlider, sustainSlider, releaseSlider,
                  sampleRateSlider;
+=======
+                 attackSlider, decaySlider, sustainSlider, releaseSlider;
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 
     juce::Label masterVolLabel,  masterPanLabel,
                 vibeSpeedLabel, vibeIntstyLabel,
                 channelVolLabel, channelPanLabel,
                 downSampleLabel, glissandoLabel, fineTuneLabel,
+<<<<<<< HEAD
                 attackLabel, decayLabel, sustainLabel, releaseLabel,
                 sampleRateLabel;
+=======
+                attackLabel, decayLabel, sustainLabel, releaseLabel;
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> masterVolAttachment,  masterPanAttachment,
                                                                           vibeSpeedAttachment, vibeIntstyAttachment,

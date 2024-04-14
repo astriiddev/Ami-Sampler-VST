@@ -8,12 +8,16 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+<<<<<<< HEAD
 
 #include "astro_formats/astro_IffAudioFormat.h"
 #include "astro_formats/astro_MuLawFormat.h"
 #include "astro_formats/astro_BrrAudioFormat.h"
 
 #include "AmiSamplerSound.h"
+=======
+#include "NewSamplerVoice.h"
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 
 //==============================================================================
 AmiAudioProcessor::AmiAudioProcessor()
@@ -30,11 +34,15 @@ AmiAudioProcessor::AmiAudioProcessor()
 {
     formatManager.registerBasicFormats();
 
+<<<<<<< HEAD
     formatManager.registerFormat(new IffAudioFormat(), false);
     formatManager.registerFormat(new MuLawFormat(), false);
     formatManager.registerFormat(new BrrAudioFormat(), false);
 
     for(int n = 0; n < NUM_SAMPLERS; n++)
+=======
+    for(int n = 0; n < numSamplers; n++)
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     {
         sampler[n].setNoteStealingEnabled(true);
 
@@ -44,13 +52,21 @@ AmiAudioProcessor::AmiAudioProcessor()
 
         sampleName[n] = "";
 
+<<<<<<< HEAD
         loopEnable[n] = loopStart[n] = loopEnd[n] = pingpongLoop[n] = 0;
+=======
+        loopEnable[n] = loopStart[n] = loopEnd[n] = 0;
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
         paulaStereo[n] = panCounter[n] = 0;
 
         channelMute[n] = channelSolo[n] = sampleMidiChannel[n] = 0;
 
         snh[n] = 1;
+<<<<<<< HEAD
         sourceSampleRate[n] = resampleRate[n] = 16726.;
+=======
+        sourceSampleRate[n] = 16726.;
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 
         midiLowNote[n] = 0;
         midiRootNote[n] = 60;
@@ -69,14 +85,21 @@ AmiAudioProcessor::AmiAudioProcessor()
 
     APVTS.state.addListener(this);
     keyState.addListener(this);
+<<<<<<< HEAD
     midiCollector.reset(devSampleRate);
 
     voiceRange.setRange(0, 128, true);
+=======
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 }
 
 AmiAudioProcessor::~AmiAudioProcessor()
 {
+<<<<<<< HEAD
     for (int n = 0; n < NUM_SAMPLERS; n++)
+=======
+    for (int n = 0; n < numSamplers; n++)
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
         sampler[n].clearSounds();
 
     formatManager.clearFormats();
@@ -146,11 +169,19 @@ void AmiAudioProcessor::changeProgramName (int /*index*/, const juce::String& /*
 }
 
 //==============================================================================
+<<<<<<< HEAD
 void AmiAudioProcessor::prepareToPlay (double deviceSampleRate, int /*samplesPerBlock*/)
 {
     devSampleRate = deviceSampleRate;
 
     for (int n = 0; n < NUM_SAMPLERS; n++)
+=======
+void AmiAudioProcessor::prepareToPlay (double sampleRate, int /*samplesPerBlock*/)
+{
+    devSampleRate = sampleRate;
+
+    for (int n = 0; n < numSamplers; n++)
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
         sampler[n].setCurrentPlaybackSampleRate(devSampleRate);
 
     initFilters();
@@ -208,21 +239,39 @@ void AmiAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
 
     midiBuffer = midiMessages;
     midiCollector.removeNextBlockOfMessages(midiBuffer, buffer.getNumSamples());
+<<<<<<< HEAD
 
     keyState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
     
     hostIsPlaying = getPlayHead()->getPosition()->getIsPlaying();
     
+=======
+    updateParams();
+
+    keyState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
+    
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     if (!midiBuffer.isEmpty())
     {
         for (int i = 0; i < midiBuffer.data.size() - 2; i++)
         {
+<<<<<<< HEAD
             if (i == 6 && (midiBuffer.data.operator[](i) & 0xB0) == 0xB0)
             {
                 if (midiBuffer.data.operator[](i + 1) == 1)
                 {
                     modIntensity = midiBuffer.data.operator[](i + 2);
                     setAVPTSvalue("VIBRATO INTENSITY", modIntensity);
+=======
+            if (i == 6 && (midiBuffer.data.getUnchecked(i) & 0xB0) == 0xB0)
+            {
+                if (midiBuffer.data.getUnchecked(i + 1) == 1)
+                {
+                    modIntensity = midiBuffer.data.getUnchecked(i + 2);
+                    APVTS.getParameter("VIBRATO INTENSITY")->beginChangeGesture();
+                    APVTS.getParameterAsValue("VIBRATO INTENSITY").setValue(modIntensity);
+                    APVTS.getParameter("VIBRATO INTENSITY")->endChangeGesture();
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
                     break;
                 }
             }
@@ -232,7 +281,11 @@ void AmiAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+<<<<<<< HEAD
     for (int n = 0; n < NUM_SAMPLERS; n++)
+=======
+    for (int n = 0; n < numSamplers; n++)
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
         sampler[n].renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
     while (--numSamples >= 0)
@@ -287,6 +340,7 @@ void AmiAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
 
+<<<<<<< HEAD
     if (xmlState.get() == nullptr)
     {
         currentSample = 0;
@@ -342,6 +396,36 @@ void AmiAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     }
 
     currentSample = 0;
+=======
+    init = true;
+
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName(APVTS.state.getType()))
+        {
+            APVTS.replaceState(juce::ValueTree::fromXml(*xmlState));
+            int soloedSample = -1;
+            for (int i = 0; i < numSamplers; i++)
+            {
+                currentSample = i;
+                juce::String pathAPVTS = "pathname";
+                pathAPVTS.append(juce::String(i), 2);
+                juce::String path = APVTS.state.getProperty(pathAPVTS).toString();
+
+                if (path.isNotEmpty()) 
+                {
+                    loadFile(path);
+
+                    paramsUpdated = true;
+                    updateParams();
+
+                    if (channelSolo[i]) soloedSample = i;
+                }
+            }
+
+            currentSample = 0;
+        }
+
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     init = false;
 }
 
@@ -362,6 +446,7 @@ void AmiAudioProcessor::handleNoteOff(juce::MidiKeyboardState* /*source*/, int m
     midiCollector.addMessageToQueue(m);
 }
 
+<<<<<<< HEAD
 bool AmiAudioProcessor::saveFile(juce::File &file)
 {
     juce::StringPairArray metaData = NULL;
@@ -428,11 +513,125 @@ bool AmiAudioProcessor::saveFile(juce::File &file)
     {
         writer->writeFromAudioSampleBuffer(waveForm[currentSample], 0, waveForm[currentSample].getNumSamples());
         return true;
+=======
+void AmiAudioProcessor::saveFile(const juce::String& name)
+{
+    juce::WavAudioFormat wavFormat;
+    juce::AiffAudioFormat aifFormat;
+    juce::IffAudioFormat iffFormat;
+    juce::MuLawFormat muFormat;
+
+    std::unique_ptr<juce::AudioFormatWriter> writer;
+
+    juce::FileChooser chooser{ "Save file", juce::File::getCurrentWorkingDirectory().getChildFile(name), "*.wav;*.aif;*.aiff;*.iff;*.raw;*.bin" };
+    juce::File file;
+
+    juce::StringPairArray wavMetaData, iffMetaData, aifMetaData;
+
+    for (int i = 0; i < 16; i++)
+        keyState.allNotesOff(i);
+
+    if (loopEnable[currentSample])
+    {
+        wavMetaData.set("Loop0Start", juce::String(getLoopStart(currentSample)));
+        wavMetaData.set("Loop0End", juce::String(getLoopEnd(currentSample) - 1));
+        wavMetaData.set("NumSampleLoops", "1");
+        
+        iffMetaData.set("Loop0Start", juce::String(getLoopStart(currentSample)));
+        iffMetaData.set("Loop0Repeat", juce::String(getLoopEnd(currentSample) - getLoopStart(currentSample)));
+
+        aifMetaData.set("NumSampleLoops", "1");
+        aifMetaData.set("CueNote0Identifier", "0");
+        aifMetaData.set("CueNote0Text", "Created with Ami Sampler");
+        aifMetaData.set("CueNote0TimeStamp", "3768748643");
+        aifMetaData.set("NumCueNotes", "1");
+
+        aifMetaData.set("Loop0Type", "0");
+        aifMetaData.set("Loop0StartIdentifier", juce::String(getLoopStart(currentSample)));
+        aifMetaData.set("Loop0EndIdentifier", juce::String(getLoopEnd(currentSample) - 1));
+        aifMetaData.set("Loop1Type", "0");
+        aifMetaData.set("Loop1StartIdentifier", juce::String(getLoopStart(currentSample)));
+        aifMetaData.set("Loop1EndIdentifier", juce::String(getLoopEnd(currentSample) - 1));
+    }
+    else
+        wavMetaData = aifMetaData = NULL;
+
+    if (chooser.browseForFileToSave(true))
+    {
+        file = chooser.getResult();
+
+        if (file.hasFileExtension(""))
+        {
+            if (file.withFileExtension("raw").exists())
+                file.withFileExtension("raw").deleteFile();
+
+            else if (file.withFileExtension("smp").exists())
+                file.withFileExtension("smp").deleteFile();
+        }
+
+        if (file.exists())
+            file.deleteFile();
+
+        if (file.hasFileExtension(".wav") || file.hasFileExtension(""))
+            writer.reset(wavFormat.createWriterFor(new juce::FileOutputStream(file.withFileExtension("wav")),
+                sourceSampleRate[currentSample], waveForm[currentSample].getNumChannels(), 8, wavMetaData, 0));
+
+        if (file.hasFileExtension(".iff"))
+            writer.reset(iffFormat.createWriterFor(new juce::FileOutputStream(file.withFileExtension("iff")),
+                8363, 1, 8, iffMetaData, 0));
+
+        if (file.hasFileExtension(".raw") || file.hasFileExtension("smp"))
+            writer.reset(iffFormat.createWriterFor(new juce::FileOutputStream(file)));
+
+        if (file.hasFileExtension(".bin"))
+            writer.reset(muFormat.createWriterFor(new juce::FileOutputStream(file)));
+
+        if (file.hasFileExtension(".aif") || file.hasFileExtension(".aiff"))
+            writer.reset(aifFormat.createWriterFor(new juce::FileOutputStream(file),
+                sourceSampleRate[currentSample], waveForm[currentSample].getNumChannels(), 8, aifMetaData, 0));
+
+        if (writer != nullptr && (file.hasFileExtension(".wav") || file.hasFileExtension(".aif") || file.hasFileExtension(".bin") ||
+            file.hasFileExtension(".iff") || file.hasFileExtension(".raw") || file.hasFileExtension(".smp") || file.hasFileExtension("")))
+        {
+            writer->writeFromAudioSampleBuffer(waveForm[currentSample], 0, waveForm[currentSample].getNumSamples());
+        }
+        else
+            juce::AlertWindow::showMessageBox(juce::AlertWindow::NoIcon,
+                "File not saved!", "Could not save file.",
+                "OK", nullptr);
+    }
+}
+
+bool AmiAudioProcessor::buttonLoadFile()
+{
+    for (int i = 0; i < 16; i++)
+        keyState.allNotesOff(i);
+
+    juce::FileChooser chooser{ "Open File", juce::File::getCurrentWorkingDirectory(), "*.wav;*.aif;*.aiff;*.iff;*.raw;*.brr;*.bin;" };
+
+    if (chooser.browseForFileToOpen())
+    {
+        auto file = chooser.getResult();
+    
+        if (file.hasFileExtension("wav") || file.hasFileExtension("aif") || file.hasFileExtension("aiff") || file.hasFileExtension("bin") ||
+            file.hasFileExtension("brr") || file.hasFileExtension("iff") || file.hasFileExtension("raw")  || file.hasFileExtension("smp") ||
+            !file.getFileName().contains("."))
+        {
+            if(!loadFile(file.getFullPathName())) return false;
+            return true;
+        }
+
+        juce::AlertWindow::showMessageBox(juce::AlertWindow::NoIcon,
+                "File type invalid!", "Please select a valid file type",
+                                              "OK", nullptr);
+        return false;
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     }
     
     return false;
 }
 
+<<<<<<< HEAD
 void AmiAudioProcessor::saveFileButton(const juce::String &name,  std::function<void (const juce::FileChooser&)>& callback )
 {
     const int flags = juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::warnAboutOverwriting | juce::FileBrowserComponent::canSelectFiles;
@@ -499,10 +698,41 @@ bool AmiAudioProcessor::loadFile(const juce::String& path)
         delete formatReader;
         return false;
     }
+=======
+bool AmiAudioProcessor::loadFile(const juce::String& path)
+{
+    juce::File file = juce::File(path);
+
+    if ((!file.exists() || file.getSize() <= 0))
+    {
+        juce::AlertWindow::showMessageBox(juce::AlertWindow::NoIcon,
+            "File not found!", path + " not found!", "OK", nullptr);
+
+        /* Clears out sample data if previous file isn't found */
+        sampler[currentSample].clearSounds();
+        
+        return false;
+    }
+
+    sampler[currentSample].clearSounds();
+    
+    juce::String pathAPVTS = "pathname";
+    pathAPVTS.append(juce::String(currentSample), 2);
+    APVTS.state.setProperty(juce::Identifier(pathAPVTS), path, nullptr);
+
+    sampleName[currentSample] = file.getFileNameWithoutExtension();
+    std::unique_ptr<juce::AudioFormatReader> formatReader(formatManager.createReaderFor(file));
+
+    if(formatReader == nullptr) return false;
+    
+    auto sampleLength = static_cast<int>(formatReader->lengthInSamples);
+    if(sampleLength <= 1) return false;
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     
     waveForm[currentSample].setSize(1, sampleLength);
     formatReader->read(&waveForm[currentSample], 0, sampleLength, 0, true, false);
 
+<<<<<<< HEAD
     waveformData = std::make_unique<juce::MemoryBlock>((void*) waveForm[currentSample].getReadPointer(0), (size_t) sampleLength * sizeof *waveForm[currentSample].getReadPointer(0));
     APVTS.state.setProperty(juce::Identifier("waveformdata" + juce::String(currentSample)), waveformData->toBase64Encoding(), nullptr);
     
@@ -523,6 +753,19 @@ bool AmiAudioProcessor::loadFile(const juce::String& path)
     }
 
     metaData = formatReader->metadataValues;
+=======
+    juce::BigInteger range;
+    range.setRange(0, 128, true);
+
+    sampler[currentSample].addSound(new NewSamplerSound("Sample", currentSample, *formatReader,
+        range, 60, 0.1, 0.1, 10.0, *this));
+
+    juce::StringPairArray metaData = formatReader.get()->metadataValues;
+
+    int fileLoopEnable = 0, fileLoopStart = 0, fileLoopEnd = 0;
+
+    if (init) return true;
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 
     if (metaData.containsKey("Loop0Start") && metaData.containsKey("Loop0End"))
     {
@@ -543,8 +786,25 @@ bool AmiAudioProcessor::loadFile(const juce::String& path)
         setLoopStart(currentSample,fileLoopStart);
         setLoopEnd(currentSample, fileLoopEnd);
     }
+<<<<<<< HEAD
     
     delete formatReader;
+=======
+
+    sourceSampleRate[currentSample] = formatReader.get()->sampleRate;
+
+    if(sourceSampleRate[currentSample] > 28000)
+    {
+        juce::String samphold = "SAMP N HOLD" + juce::String(currentSample);
+
+        APVTS.getParameter(samphold)->beginChangeGesture();
+        APVTS.getParameterAsValue(samphold).setValue(-round(sourceSampleRate[currentSample] / 16726.0));
+        APVTS.getParameter(samphold)->endChangeGesture();
+    }
+    
+    updateParams();
+    
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     return true;
 }
 
@@ -557,22 +817,35 @@ void AmiAudioProcessor::setNumVoices(const int i)
     sampler[i].clearVoices();
 
     for (int n = 0; n < newNumVoices; n++)
+<<<<<<< HEAD
         sampler[i].addVoice(new AmiSamplerVoice(*this));
+=======
+        sampler[i].addVoice(new NewSamplerVoice(*this));
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 }
 
 void AmiAudioProcessor::incVibratoTable()
 {
     const double vibeFreq = (vibeSpeed * 32.) / devSampleRate;
+<<<<<<< HEAD
     const int vibePos = (int)std::floor(vibeRate);
 
     if (modIntensity == 0) { vibeRatio = 1.; return; }
 
     vibeRatio = 1.f + ((float) (128 - vibratoTable[vibePos]) * (float) modIntensity) / 409600.f;
+=======
+    const int vibePos = (int)floor(vibeRate);
+
+    if (modIntensity == 0) { vibeRatio = 1.; return; }
+
+    vibeRatio = 1.f + ((float)(128 - vibratoTable[vibePos]) * (float)modIntensity) / 409600.f;
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 
     vibeRate += vibeFreq;
     if (vibeRate >= 32.) vibeRate = 0.;
 }
 
+<<<<<<< HEAD
 void AmiAudioProcessor::resampleAudioData(const int chan, const double newRate)
 {
     std::unique_ptr<juce::MemoryBlock> waveformData = nullptr;
@@ -649,6 +922,8 @@ void AmiAudioProcessor::setSamplerEnvelopes(const int i, void* sound)
     sampleSound->setEnvelopeParameters(adsrParams);
 }
 
+=======
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 void AmiAudioProcessor::initFilters()
 {
     double  R  = 0., C  = 0.,
@@ -698,8 +973,11 @@ void AmiAudioProcessor::getAmiFilter(const float* inL, const float* inR, float* 
     float filteredL = 0.f;
     float filteredR = 0.f;
 
+<<<<<<< HEAD
     jassert(inL != nullptr && inR != nullptr && outL != nullptr && outR != nullptr);
 
+=======
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
     if (isA500)
     {
         rcFilter.onePoleLPFilter(&a500FilterLo, inL, inR, &filteredL, &filteredR);
@@ -715,6 +993,7 @@ void AmiAudioProcessor::getAmiFilter(const float* inL, const float* inR, float* 
 
     *outL = filteredL;
     *outR = filteredR;
+<<<<<<< HEAD
 }
 
 std::unique_ptr<juce::AudioParameterInt> AmiAudioProcessor::createParam(const juce::String& name, const int min, const int max, const int def)
@@ -725,10 +1004,14 @@ std::unique_ptr<juce::AudioParameterInt> AmiAudioProcessor::createParam(const ju
 std::unique_ptr<juce::AudioParameterFloat> AmiAudioProcessor::createParam(const juce::String &name, const float& min, const float& max, const float& inc, const float def)
 {
     return std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ name.toUpperCase(), 1 }, name, juce::NormalisableRange<float>(min, max, inc), def);
+=======
+
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout AmiAudioProcessor::createParameters()
 {
+<<<<<<< HEAD
     juce::Array<std::unique_ptr<juce::RangedAudioParameter>> parameters;
 
     for (int i = 0; i < NUM_SAMPLERS; i++)
@@ -773,10 +1056,87 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmiAudioProcessor::createPar
 
     parameters.add(createParam("LED Filter", 0, 1, 0));
     parameters.add(createParam("Model Type", 0, 1, 0));
+=======
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> parameters;
+
+    for (int i = 0; i < numSamplers; i++)
+    {
+        const juce::String sampleParam = juce::String(i);
+
+        const juce::String loop_start = "Loop Start" + sampleParam;
+        const juce::String loop_end = "Loop End" + sampleParam;
+        const juce::String loop_enable = "Loop Enable" + sampleParam;
+
+        const juce::String stereo_on = "Paula Stereo" + sampleParam;
+        const juce::String mute_on = "Mute" + sampleParam;
+        const juce::String solo_on = "Solo" + sampleParam;
+
+        const juce::String midiChannel = "Sample MIDI Chan" + sampleParam;
+        const juce::String rootNote = "Sample Root Note" + sampleParam;
+        const juce::String lowNote = "Sample Low Note" + sampleParam;
+        const juce::String highNote = "Sample High Note" + sampleParam;
+
+        const juce::String sampleNhold = "Samp n Hold" + sampleParam;
+        const juce::String monoPoly = "Mono Poly" + sampleParam;
+        const juce::String fineTune = "Fine Tune" + sampleParam;
+
+        const juce::String chanVol = "Channel Volume" + sampleParam;
+        const juce::String chanPan = "Channel Pan" + sampleParam;
+        const juce::String chanWidth = "Channel Width" + sampleParam;
+        const juce::String chanGliss = "Channel Gliss" + sampleParam;
+
+        const juce::String attack = "Attack" + sampleParam;
+        const juce::String decay = "Decay" + sampleParam;
+        const juce::String sustain = "Sustain" + sampleParam;
+        const juce::String release = "Release" + sampleParam;
+
+        parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{ loop_enable.toUpperCase(), 1 }, loop_enable, 0, 1, 0));
+        parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{ loop_start.toUpperCase(), 1 }, loop_start, 0, INT32_MAX, 0));
+        parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{ loop_end.toUpperCase(), 1 }, loop_end, 0, INT32_MAX, 0));
+                                                                        
+        parameters.push_back(std:: make_unique<juce::AudioParameterInt>(juce::ParameterID{ stereo_on.toUpperCase(), 1 }, stereo_on, 0, 1, 0));
+        parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{ mute_on.toUpperCase(), 1 }, mute_on, 0, 1, 0));
+        parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{ solo_on.toUpperCase(), 1 }, solo_on, 0, 1, 0));
+ 
+        parameters.push_back(std:: make_unique<juce::AudioParameterInt>(juce::ParameterID{ midiChannel.toUpperCase(), 1 }, midiChannel, 0, 16, 0));
+        parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{ rootNote.toUpperCase(), 1 }, rootNote, 0, 127, 60));
+        parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{ lowNote.toUpperCase(), 1 }, lowNote, 0, 127, 0));
+        parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{ highNote.toUpperCase(), 1 }, highNote, 0, 127, 127));
+                                                                     
+        parameters.push_back(std:: make_unique<juce::AudioParameterInt>(juce::ParameterID{ monoPoly.toUpperCase(), 1 }, monoPoly, 1, 3, 3));
+
+        parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ sampleNhold.toUpperCase(), 1 }, sampleNhold, juce::NormalisableRange<float>(-16.f, -1.f, 1.f), -1.f));
+        parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ chanGliss.toUpperCase(), 1 }, chanGliss, juce::NormalisableRange<float>(1.f, 100.f, 1.f), 1.f));
+        parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ fineTune.toUpperCase(), 1 }, fineTune, juce::NormalisableRange<float>(-50.f, 50.f, 50.f/127.f), 0.f));
+ 
+        parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ chanVol.toUpperCase(), 1 }, chanVol, juce::NormalisableRange<float>(0.f, 128.f, 1.f), 64.f));
+        parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ chanPan.toUpperCase(), 1 }, chanPan, juce::NormalisableRange<float>(0.f, 255.f, 1.f), 128.f));
+        parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ chanWidth.toUpperCase(), 1 }, chanWidth, juce::NormalisableRange<float>(0.f, 255.f, 1.f), 255.f));
+
+        parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ attack.toUpperCase(), 1 }, attack,
+            juce::NormalisableRange<float>(0.0003f, 10.0f, 0.15625f), 0.0003f));
+        parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ decay.toUpperCase(), 1 }, decay,
+            juce::NormalisableRange<float>(0.0f, 4.0f, 0.0625f), 0.0f));
+        parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ sustain.toUpperCase(), 1 }, sustain,
+            juce::NormalisableRange<float>(0.0f, 1.0f, 0.015625f), 1.0f));
+        parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ release.toUpperCase(), 1 }, release,
+            juce::NormalisableRange<float>(0.001f, 5.0f, 0.078125f), 0.001f));
+    }
+
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ "MASTER VOLUME", 1 }, "Master Volume", juce::NormalisableRange<float>(0.f, 64.f, 1.f), 32.f));
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ "MASTER PAN", 1 }, "Master Pan", juce::NormalisableRange<float>(0.f, 255.f, 1.f), 128.f));
+
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ "VIBRATO SPEED", 1 }, "Vibrato Speed", juce::NormalisableRange<float>(1.f, 10.f, 0.01f), 5.f));
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{ "VIBRATO INTENSITY", 1 }, "Vibrato Intensity", juce::NormalisableRange<float>(0.f, 127.f, 1.f), 0.f));
+
+    parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{ "LED FILTER", 1 }, "LED Filter", 0, 1, 0));
+    parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{ "MODEL TYPE", 1 }, "Model Type", 0, 1, 0));
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 
     return { parameters.begin(), parameters.end() };
 }
 
+<<<<<<< HEAD
 void AmiAudioProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property)
 {
     const juce::String changedParam = treeWhosePropertyHasChanged.getProperty(treeWhosePropertyHasChanged.getPropertyName(0)).toString();
@@ -935,6 +1295,102 @@ bool AmiAudioProcessor::changeValueTreeParam(const juce::String &param, const ju
     *paramVar = paramVal.operator double();
 
     return true;
+=======
+void AmiAudioProcessor::updateParams()
+{
+    if (!paramsUpdated) return;
+
+    const juce::String sampleParam = juce::String(currentSample);
+
+    const juce::String loop_start = "LOOP START" + sampleParam;
+    const juce::String loop_end = "LOOP END" + sampleParam;
+    const juce::String loop_enable = "LOOP ENABLE" + sampleParam;
+
+    const juce::String stereo_on = "PAULA STEREO" + sampleParam;
+    const juce::String mute_on = "MUTE" + sampleParam;
+    const juce::String solo_on = "SOLO" + sampleParam;
+
+    const juce::String midiChannel = "SAMPLE MIDI CHAN" + sampleParam;
+    const juce::String rootNote = "SAMPLE ROOT NOTE" + sampleParam;
+    const juce::String lowNote = "SAMPLE LOW NOTE" + sampleParam;
+    const juce::String highNote = "SAMPLE HIGH NOTE" + sampleParam;
+
+    const juce::String sampleNhold = "SAMP N HOLD" + sampleParam;
+
+    const juce::String monoPoly = "MONO POLY" + sampleParam;
+    const juce::String chanGliss = "CHANNEL GLISS" + sampleParam;
+    const juce::String fineTune = "FINE TUNE" + sampleParam;
+
+    const juce::String chanVol = "CHANNEL VOLUME" + sampleParam;
+    const juce::String chanPan = "CHANNEL PAN" + sampleParam;
+    const juce::String chanWidth = "CHANNEL WIDTH" + sampleParam;
+
+    const juce::String attack = "ATTACK" + sampleParam;
+    const juce::String decay = "DECAY" + sampleParam;
+    const juce::String sustain = "SUSTAIN" + sampleParam;
+    const juce::String release = "RELEASE" + sampleParam;
+
+    const float pan = APVTS.getRawParameterValue("MASTER PAN")->load();
+
+    masterVol = powf(APVTS.getRawParameterValue("MASTER VOLUME")->load(), 2)/powf(64, 2);
+
+    masterPanL = pan <= 128 ? 1.f : abs(pan - 255) / 127;
+    masterPanR = pan >= 128 ? 1.f : pan / 127;
+
+    vibeSpeed = (double)APVTS.getRawParameterValue("VIBRATO SPEED")->load();
+    modIntensity = (int)APVTS.getRawParameterValue("VIBRATO INTENSITY")->load();
+
+    ledFilterOn = (int)APVTS.getRawParameterValue("LED FILTER")->load();
+    isA500 = (int)APVTS.getRawParameterValue("MODEL TYPE")->load();
+    
+    sampleMidiChannel[currentSample] = (int)APVTS.getRawParameterValue(midiChannel)->load();
+    midiRootNote[currentSample] = (int)APVTS.getRawParameterValue(rootNote)->load();
+    midiLowNote[currentSample] = (int)APVTS.getRawParameterValue(lowNote)->load();
+    midiHiNote[currentSample] = (int)APVTS.getRawParameterValue(highNote)->load();
+
+    snh[currentSample] = (int)abs(APVTS.getRawParameterValue(sampleNhold)->load());
+
+    channelVolume[currentSample] = powf(APVTS.getRawParameterValue(chanVol)->load(), 2) / powf(64, 2);
+
+    loopEnable[currentSample] = (int)APVTS.getRawParameterValue(loop_enable)->load();
+    loopStart[currentSample] = (int)APVTS.getRawParameterValue(loop_start)->load();
+    loopEnd[currentSample] = (int)APVTS.getRawParameterValue(loop_end)->load();
+
+    numVoices[currentSample] = (int)(int)APVTS.getRawParameterValue(monoPoly)->load();
+
+    if (numVoices[currentSample] != sampler[currentSample].getNumVoices()) setNumVoices(currentSample);
+
+    paulaStereo[currentSample] = (int)APVTS.getRawParameterValue(stereo_on)->load();
+
+    channelGliss[currentSample] = APVTS.getRawParameterValue(chanGliss)->load();
+    tune[currentSample] = APVTS.getRawParameterValue(fineTune)->load();
+
+    channelMute[currentSample] = (int)APVTS.getRawParameterValue(mute_on)->load();
+    channelSolo[currentSample] = (int)APVTS.getRawParameterValue(solo_on)->load();
+
+    channelPan[currentSample] = paulaStereo[currentSample] ? APVTS.getRawParameterValue(chanWidth)->load() :
+                                                             APVTS.getRawParameterValue(chanPan)->load();
+
+    adsrParams.attack = APVTS.getRawParameterValue(attack)->load();
+    adsrParams.sustain = APVTS.getRawParameterValue(sustain)->load();
+    adsrParams.decay = APVTS.getRawParameterValue(decay)->load();
+    adsrParams.release = APVTS.getRawParameterValue(release)->load();
+
+    for (int i = 0; i < sampler[currentSample].getNumSounds(); ++i)
+    {
+        if (auto sound = dynamic_cast<NewSamplerSound*>(sampler[currentSample].getSound(i).get()))
+        {
+            sound->setEnvelopeParameters(adsrParams);
+        }
+    }
+
+    paramsUpdated = false;
+}
+
+void AmiAudioProcessor::valueTreePropertyChanged(juce::ValueTree& /*treeWhosePropertyHasChanged*/, const juce::Identifier& /*property*/)
+{
+    paramsUpdated = true;
+>>>>>>> 1374dd9113eb167dae43dbc5650cd7c1ff690895
 }
 
 //==============================================================================
