@@ -365,6 +365,16 @@ void GuiComponent::buttonClicked(juce::Button *button)
         }
         audioProcessor.setSolo(currentSample, !audioProcessor.isSoloed(currentSample)); 
     };
+
+    if(button == &monoBox)
+    {
+        audioProcessor.setMonoPoly(currentSample, 1); 
+        
+        if(audioProcessor.paulaStereoOn(currentSample))
+            paulaStereo.setToggleState(false, juce::NotificationType::sendNotification);
+        
+        paulaStereo.setEnabled(false);
+    }
 }
 
 void GuiComponent::parameterChanged(const juce::String &parameterID, float newValue)
@@ -668,14 +678,8 @@ void GuiComponent::initAllCheckboxes()
 
     initCheckBox(&enableAscii2Note, "Enabled", -1);
 
-    monoBox.onClick = [&] 
-    {
-        audioProcessor.setMonoPoly(currentSample, 1); 
-        if(audioProcessor.paulaStereoOn(currentSample)) paulaStereo.triggerClick();
-    };
-    
-    ptpolyBox.onClick   = [&] { audioProcessor.setMonoPoly(currentSample, 2); };
-    octapolyBox.onClick = [&] { audioProcessor.setMonoPoly(currentSample, 3); };
+    ptpolyBox.onClick   = [&] { audioProcessor.setMonoPoly(currentSample, 2); paulaStereo.setEnabled(true); };
+    octapolyBox.onClick = [&] { audioProcessor.setMonoPoly(currentSample, 3); paulaStereo.setEnabled(true); };
 
     ledFilter.onClick = [&] { repaint(ledRectangle); };
 
