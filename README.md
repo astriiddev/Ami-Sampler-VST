@@ -26,7 +26,7 @@
   
 </pre>
 
-![image](https://github.com/astriiddev/Ami-Sampler/assets/98296288/e3523618-9c2a-4b76-9183-02e9512bea2b)
+![image](https://github.com/astriiddev/Ami-Sampler-VST/assets/98296288/04bf0afe-4dd8-4c98-94b7-9626dd64a960)
 
 # Ami Sampler
 The Commodore Amiga revolutionized the home computer when it hit the shelves in 1985. Not only sporting colourful 16-bit graphics but also boasting four channels of 8-bit sampled audio. With sample sequencing software like ProTracker and OctaMED, it was the first computer that allowed its users to record and sequence instruments into a full song; inspiring musicians, programmers, graphic designers, and hackers to show what they could really do with the new technology that the Amiga gave them. And while its specs may seem like they pale in comparison to more modern computers, its sound and legacy continue to inspire people to this day.
@@ -56,7 +56,8 @@ Sample saving is done with the SAVE button; currently only WAV, AIF, IFF, raw, a
 # Things to add, bugs to fix
 The two most features that I still need to add are sample presets (hence the samples included externally in the repo) and BLEP synthesis for a more accurate recreation of the Amiga's sound. These are both a bit far out and may take some time to implement.
 
-The two bugs I'm currently aware of is the mouse cursor not changing to the Amiga cursor sometimes, and the mouse-wheel coordinates being completely off in Ableton if "Auto-Scale Plugin Window" is disabled for high DPI screens. Sometimes these incorrect coordinates read as a negative coordinate and completely crash Ableton. It is recommended that you leave "Auto-Scale Plugin Window" enabled if you are using Ableton and have a high DPI screen.
+The main bug that I'm currently aware of is the mouse cursor not changing to the Amiga cursor sometimes. This seems to only be present in Ableton when the playhead is moving.
+(Previous versions had a bug with Auto-Scale PLugin Window in Ableton. This has since been fixed in the current JUCE version)
 
 Ami Sampler has been tested and working on the following.
 
