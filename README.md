@@ -37,6 +37,10 @@ https://github.com/astriiddev/Ami-Sampler-VST/assets/98296288/fe12af70-d8be-4d9a
 
 https://github.com/astriiddev/Ami-Sampler-VST/assets/98296288/cca21d16-3dfb-4881-8c29-4aa84a049bbf
 
+<a href="https://www.paypal.com/donate/?hosted_button_id=HXGUCB6MBN43Y">
+  <img src="https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png" alt="Donate with PayPal" />
+</a>
+
 # Controls / Parameters
 For the most part, the Ami Sampler has pretty standard controls that one would expect to find in a sampler VST. There are twelve individual samplers. Each sampler has its own volume, pan, and ADSR controls as well as solo/mute. There's also the option for each channel to be monophonic, four-voice polyphonic (PT poly), or eight-voice polyphonic (Octa poly). There's also a sample rate decimator control and when the channel is in monophonic mode, there's a control for pitch glide. Master output has controls for master volume, master pan, a switch to enable a 4.4khz 6db/octave low pass filter (modeled after the RC filter in the Amiga 500), a switch to enable a 3.1khz 12db/octave low pass filter (modeled after the LED filter in the Amiga 500 and Amiga 1200), and vibrato speed and depth.
 
