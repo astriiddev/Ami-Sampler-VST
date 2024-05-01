@@ -257,9 +257,9 @@ void GuiComponent::changeSampleChannel(const int &channel)
     if (midiChannel > 0) sampleMidiChannel.setText(juce::String(midiChannel).paddedLeft('0', 2), juce::NotificationType::dontSendNotification);
     else sampleMidiChannel.setText("ALL", juce::NotificationType::dontSendNotification);
 
-    midiRootNote.setText(notes[audioProcessor.getRootNote(currentSample)], juce::NotificationType::dontSendNotification);
-    midiLowNote.setText(notes[audioProcessor.getLowNote(currentSample)], juce::NotificationType::dontSendNotification);
-    midiHiNote.setText(notes[audioProcessor.getHighNote(currentSample)], juce::NotificationType::dontSendNotification);
+    midiRootNote.setText(notes.operator[](audioProcessor.getRootNote(currentSample)), juce::NotificationType::dontSendNotification);
+    midiLowNote.setText(notes.operator[](audioProcessor.getLowNote(currentSample)), juce::NotificationType::dontSendNotification);
+    midiHiNote.setText(notes.operator[](audioProcessor.getHighNote(currentSample)), juce::NotificationType::dontSendNotification);
 
     if(audioProcessor.getPingPongLoop(currentSample))
     {
@@ -409,19 +409,19 @@ void GuiComponent::parameterChanged(const juce::String &parameterID, float newVa
     if (parameterID.contains("SAMPLE ROOT NOTE" + juce::String(currentSample)))
     {
         const int midiNote = newValue < 0 ? 0 : newValue > 127 ? 127 : (int) newValue;
-        midiRootNote.setText(notes[midiNote], juce::NotificationType::dontSendNotification);
+        midiRootNote.setText(notes.operator[](midiNote), juce::NotificationType::dontSendNotification);
     }
 
     if (parameterID.contains("SAMPLE LOW NOTE" + juce::String(currentSample)))
     {
         const int midiNote = newValue < 0 ? 0 : newValue > 127 ? 127 : (int) newValue;
-        midiHiNote.setText(notes[midiNote], juce::NotificationType::dontSendNotification);
+        midiLowNote.setText(notes.operator[](midiNote), juce::NotificationType::dontSendNotification);
     }
 
     if (parameterID.contains("SAMPLE HIGH NOTE" + juce::String(currentSample)))
     {
         const int midiNote = newValue < 0 ? 0 : newValue > 127 ? 127 : (int) newValue;
-        midiRootNote.setText(notes[midiNote], juce::NotificationType::dontSendNotification);
+        midiHiNote.setText(notes.operator[](midiNote), juce::NotificationType::dontSendNotification);
     }
 }
 
@@ -545,50 +545,57 @@ void GuiComponent::changeRateText(juce::Label *l)
 
 void GuiComponent::changeMidiNoteText(juce::Label *l, const int type)
 {
+    bool success = true;
     juce::String txt;
-    int note = 0;
+    int note = -1;
     
     jassert(l != nullptr);
 
     txt = l->getText().toUpperCase();
 
-    if (txt.isEmpty()) return;
+    if (txt.isEmpty()) success = false;
 
-    if (txt.containsOnly("0123456789"))
+    else if (!textInHex && txt.containsOnly("0123456789"))
     {
         note = txt.getIntValue();
     }
     else if (txt.containsOnly("0123456789ABCDEFG-#"))
     {
-        for (int i = 0; i < 128; i++)
-        {
-            if (notes[i].compare(txt) == 0)
-            {
-                note = i;
-                break;
-            }
-        }
+        // notes will always have letter or - as first character, hex value of note will always have letter as second character
+        if(std::isalpha(txt.operator[](0)) || txt.operator[](0) == '-') 
+            note = notes.indexOf(txt);
+        else
+            note = txt.getHexValue32();
+    }
+    else
+    {
+        success = false;
     }
         
-    if (note < 0 || note > 127) return;
+    if (note < 0 || note > 127) success = false;
 
     switch (type)
     {
     case 0:
 
-        audioProcessor.setRootNote(currentSample, note);
+        if(success) audioProcessor.setRootNote(currentSample, note);
+        else note = audioProcessor.getRootNote(currentSample);
         break;
     
     case 1:
 
-        audioProcessor.setLowNote(currentSample, note);
+        if(success) audioProcessor.setLowNote(currentSample, note);
+        else note = audioProcessor.getLowNote(currentSample);
         break;
         
     case 2:
 
-        audioProcessor.setHighNote(currentSample, note);
+        if(success) audioProcessor.setHighNote(currentSample, note);
+        note = audioProcessor.getHighNote(currentSample);
         break;
     }
+
+    l->setText(notes.operator[](note), juce::NotificationType::dontSendNotification);
 }
 
 void GuiComponent::initAllLabels()
