@@ -46,7 +46,7 @@ private:
     void initCheckBox(juce::Button*, const juce::String&, const int);
 
     void changeLoopText(juce::Label*, const int);
-    void changeRateText(juce::Label*);
+    void changeRateText(juce::Label*, const int);
     void changeMidiNoteText(juce::Label*, const int);
 
     void initAllLabels();
@@ -56,7 +56,9 @@ private:
 
     void hideMainOptions();
     void hideMoreOptions();
-
+    bool textIsHexValue(const juce::String& value);
+    bool textIsDecValue(const juce::String& value);
+    
     juce::Rectangle<int> ledRectangle;
 
     juce::Label startLoopText, endLoopText, replenLoopText, sampleRateText, resampleRateText,

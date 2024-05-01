@@ -156,7 +156,7 @@ void AmiWindowEditor::paint (juce::Graphics& g)
 
     g.fillRect(proportionOfWidth(0.88f) + 4, proportionOfHeight(0.72f) + 2, 1, proportionOfHeight(0.3f) - 2);
     g.fillRect(proportionOfWidth(0.71f) + 3, proportionOfHeight(0.72f) + 2, 1, proportionOfHeight(0.125f) - 2);
-    g.fillRect(proportionOfWidth(0.17f) + 2, proportionOfHeight(0.72f) + 2, 2, proportionOfHeight(0.125f) - 2);
+    g.fillRect(proportionOfWidth(0.182f) + 2, proportionOfHeight(0.72f) + 2, 2, proportionOfHeight(0.125f) - 2);
 
     g.fillRect(proportionOfWidth(0.23f) + 3, proportionOfHeight(0.5f), 1, proportionOfHeight(0.22f));
     g.fillRect(proportionOfWidth(0.46f) + 2, proportionOfHeight(0.5f), 2, proportionOfHeight(0.345f));
@@ -168,7 +168,7 @@ void AmiWindowEditor::paint (juce::Graphics& g)
 
     g.fillRect(proportionOfWidth(0.88f) + 1, proportionOfHeight(0.72f) + 2, 2, proportionOfHeight(0.3f) - 2);
     g.fillRect(proportionOfWidth(0.71f), proportionOfHeight(0.72f) + 2, 2, proportionOfHeight(0.125f) - 2);
-    g.fillRect(proportionOfWidth(0.17f), proportionOfHeight(0.72f) + 2, 2, proportionOfHeight(0.125f) - 2);
+    g.fillRect(proportionOfWidth(0.182f), proportionOfHeight(0.72f) + 2, 2, proportionOfHeight(0.125f) - 2);
 
     g.fillRect(proportionOfWidth(0.23f), proportionOfHeight(0.5f), 2, proportionOfHeight(0.22f));
     g.fillRect(proportionOfWidth(0.46f), proportionOfHeight(0.5f), 2, proportionOfHeight(0.345f));
@@ -271,7 +271,7 @@ void AmiWindowEditor::resized()
     saveButton.setBoundsRelative(0.89f, 0.785f, 0.1f, 0.051f);
     
     moreOptions.setBoundsRelative(0.72f, 0.785f, 0.15f, 0.051f);
-    resampleButton.setBoundsRelative(0.686f, 0.663f, 0.1f, 0.051f);
+    resampleButton.setBoundsRelative(0.7f, 0.663f, 0.1f, 0.051f);
 
     keyboardComponent.setBoundsRelative(0.021f, 0.86f, 0.838f, 0.13f);
     logoImage.setBoundsRelative(0.69f, 0.52f, 0.3f, 0.08f);

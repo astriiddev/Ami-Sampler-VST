@@ -369,6 +369,8 @@ bool AmiAudioProcessor::saveFile(juce::File &file)
 
     if(file.getFileName().isEmpty()) return true;
 
+    lastFileDir = file.getParentDirectory().getFullPathName();
+
     if(file.existsAsFile())
         file.deleteFile();
 
@@ -438,10 +440,12 @@ void AmiAudioProcessor::saveFileButton(const juce::String &name,  std::function<
     const int flags = juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::warnAboutOverwriting | juce::FileBrowserComponent::canSelectFiles;
     juce::File homeDirectory;
 
-    if (juce::SystemStats::getOperatingSystemType() & (juce::SystemStats::Windows | juce::SystemStats::MacOSX))
-        homeDirectory = homeDirectory.getSpecialLocation(juce::File::userDocumentsDirectory);
-    else
+    if(lastFileDir.isNotEmpty())
+        homeDirectory = juce::File(lastFileDir);
+    else if (juce::SystemStats::getOperatingSystemType() & juce::SystemStats::Linux)
         homeDirectory = homeDirectory.getSpecialLocation(juce::File::userHomeDirectory);
+    else
+        homeDirectory = homeDirectory.getSpecialLocation(juce::File::userDocumentsDirectory);
     
     if (myChooser.get() != nullptr) myChooser.reset();
 
@@ -454,12 +458,14 @@ void AmiAudioProcessor::buttonLoadFile(std::function<void (const juce::FileChoos
 {
     const int flags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
     juce::File homeDirectory;
-    
-    if(juce::SystemStats::getOperatingSystemType() & (juce::SystemStats::Windows | juce::SystemStats::MacOSX))
-        homeDirectory = homeDirectory.getSpecialLocation(juce::File::userDocumentsDirectory);
-    else
-        homeDirectory = homeDirectory.getSpecialLocation(juce::File::userHomeDirectory);
 
+    if(lastFileDir.isNotEmpty())
+        homeDirectory = juce::File(lastFileDir);
+    else if (juce::SystemStats::getOperatingSystemType() & juce::SystemStats::Linux)
+        homeDirectory = homeDirectory.getSpecialLocation(juce::File::userHomeDirectory);
+    else
+        homeDirectory = homeDirectory.getSpecialLocation(juce::File::userDocumentsDirectory);
+    
     if (myChooser.get() != nullptr) myChooser.reset();
 
     myChooser = std::make_unique<juce::FileChooser>( "Open File", homeDirectory, "*.wav;*.aif;*.aiff;*.iff;*.8svx;*.raw;*.brr;*.bin;" );
@@ -478,6 +484,8 @@ bool AmiAudioProcessor::loadFile(const juce::String& path)
     juce::File file = juce::File(path);
 
     int sampleLength = 0, fileLoopEnable = 0, fileLoopStart = 0, fileLoopEnd = 0;
+
+    lastFileDir = file.getParentDirectory().getFullPathName();
 
     if ((!file.exists() || file.getSize() <= 0))
     {

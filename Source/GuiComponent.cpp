@@ -104,8 +104,6 @@ void GuiComponent::paint (juce::Graphics& g)
         proportionOfWidth(0.2f), proportionOfHeight(0.07f)), juce::Justification::centredLeft, false);
 
         automateLabelText(&sampleRateText, (int) audioProcessor.getSourceSampleRate(currentSample));
-        automateLabelText(&resampleRateText, (int) audioProcessor.getResampleRate(currentSample));
-
         return;
     }
     
@@ -185,12 +183,12 @@ void GuiComponent::resized()
     midiLowNote.setBoundsRelative(0.595f, 0.63f, 0.035f, 0.05f);
     midiHiNote.setBoundsRelative(0.635f, 0.63f, 0.035f, 0.05f);
     
-    startLoopText.setBoundsRelative(0.1f, 0.735f, 0.07f, 0.04f);
-    endLoopText.setBoundsRelative(0.1f, 0.765f, 0.07f, 0.04f);
-    replenLoopText.setBoundsRelative(0.1f, 0.795f, 0.07f, 0.04f);
+    startLoopText.setBoundsRelative(0.1f, 0.735f, 0.08f, 0.04f);
+    endLoopText.setBoundsRelative(0.1f, 0.765f, 0.08f, 0.04f);
+    replenLoopText.setBoundsRelative(0.1f, 0.795f, 0.08f, 0.04f);
 
-    sampleRateText.setBoundsRelative(0.62f, 0.63f, 0.07f, 0.04f);
-    resampleRateText.setBoundsRelative(0.62f, 0.67f, 0.07f, 0.04f);
+    sampleRateText.setBoundsRelative(0.62f, 0.63f, 0.08f, 0.04f);
+    resampleRateText.setBoundsRelative(0.62f, 0.67f, 0.08f, 0.04f);
 
     decText.setBoundsRelative(0.12f, 0.51f, 0.05f, 0.03f);
     hexText.setBoundsRelative(0.17f, 0.51f, 0.05f, 0.03f);
@@ -244,6 +242,9 @@ void GuiComponent::changeSampleChannel(const int &channel)
     automateLabelText(&startLoopText, loopStart);
     automateLabelText(&endLoopText, loopEnd);
     automateLabelText(&replenLoopText, loopRpln);
+
+    automateLabelText(&sampleRateText, (int) audioProcessor.getSourceSampleRate(currentSample));
+    automateLabelText(&resampleRateText, (int) audioProcessor.getResampleRate(currentSample));
 
     enableLoop.setToggleState(loopEnabled, juce::NotificationType::dontSendNotification);
     enableLoop.setEnabled(loopEnabled);
@@ -329,6 +330,9 @@ void GuiComponent::buttonClicked(juce::Button *button)
         automateLabelText(&endLoopText, loopEnd);
         automateLabelText(&replenLoopText, loopEnd - loopStart);
 
+        automateLabelText(&sampleRateText, (int) audioProcessor.getSourceSampleRate(currentSample));
+        automateLabelText(&resampleRateText, (int) audioProcessor.getResampleRate(currentSample));
+
         repaint(); 
     };
     
@@ -342,6 +346,9 @@ void GuiComponent::buttonClicked(juce::Button *button)
         automateLabelText(&startLoopText, loopStart);
         automateLabelText(&endLoopText, loopEnd);
         automateLabelText(&replenLoopText, loopEnd - loopStart);
+
+        automateLabelText(&sampleRateText, (int) audioProcessor.getSourceSampleRate(currentSample));
+        automateLabelText(&resampleRateText, (int) audioProcessor.getResampleRate(currentSample));
 
         repaint(); 
     };
@@ -404,6 +411,12 @@ void GuiComponent::parameterChanged(const juce::String &parameterID, float newVa
 
         automateLabelText(&endLoopText, (int) newValue);
         automateLabelText(&replenLoopText, loopRpln);
+    }
+
+    if (parameterID.contains("SAMPLE MIDI CHAN" + juce::String(currentSample)))
+    {
+        const juce::String channel = newValue <= 0 ? "ALL" : juce::String((int) (newValue + 1));
+        sampleMidiChannel.setText(channel, juce::NotificationType::dontSendNotification);
     }
 
     if (parameterID.contains("SAMPLE ROOT NOTE" + juce::String(currentSample)))
@@ -481,65 +494,104 @@ void GuiComponent::initCheckBox(juce::Button *b, const juce::String &name, const
 
 void GuiComponent::changeLoopText(juce::Label* l, const int type)
 {
+    bool success = true;
     juce::String txt;
-    int val = 0;
+    int val = -1;
     
     jassert(l != nullptr && type < 3);
 
     txt = l->getText().toUpperCase();
 
-    if (txt.isEmpty()) return;
-    if (!txt.containsOnly("0123456789ABCDEF") || (!textInHex && !txt.containsOnly("0123456789"))) return;
+    if (txt.isEmpty())
+        success = false;
+    else if(textIsHexValue(txt))
+        val = txt.getHexValue32();
+    else if(textIsDecValue(txt))
+        val = txt.getIntValue();
+    else
+        success = false;
 
-    val = textInHex ? txt.getHexValue32() : txt.getIntValue();
+    if(val < 0) success = false;
 
     switch(type)
     {
     case 0:
 
-        if (val < 0) return;
-        if (val >= audioProcessor.getLoopEnd(currentSample)) return;
+        if (val >= audioProcessor.getLoopEnd(currentSample)) 
+            success = false;
 
-        audioProcessor.setLoopStart(currentSample, val);
+        if(success) audioProcessor.setLoopStart(currentSample, val);
+        else val = audioProcessor.getLoopStart(currentSample);
 
         break;
     
     case 1:
 
-        val += textInHex ? startLoopText.getText().getHexValue32() : startLoopText.getText().getIntValue();
+        if(!success)
+        {
+            val = audioProcessor.getLoopEnd(currentSample) - audioProcessor.getLoopStart(currentSample);
+            break;
+        }
+
+        val += audioProcessor.getLoopStart(currentSample);
         [[fallthrough]];
 
     case 2:
 
-        if (val <= audioProcessor.getLoopStart(currentSample)) return;
-        if (val > audioProcessor.getWaveForm(currentSample).getNumSamples()) return;
+        if (val <= audioProcessor.getLoopStart(currentSample) || val > audioProcessor.getWaveForm(currentSample).getNumSamples()) 
+            success = false;
 
-        audioProcessor.setLoopEnd(currentSample, val);
+        if(success) audioProcessor.setLoopEnd(currentSample, val);
+        else val = audioProcessor.getLoopEnd(currentSample);
 
         break;
     }
- 
-    l->setText(txt.paddedLeft('0', 6), juce::NotificationType::dontSendNotification);
+
+    if(type == 1) val = audioProcessor.getLoopEnd(currentSample) - audioProcessor.getLoopStart(currentSample);
+
+    txt = textInHex ? juce::String::toHexString(val).toUpperCase() : juce::String(val);
+    l->setText(txt.paddedLeft('0', 8), juce::NotificationType::dontSendNotification);
 }
 
-void GuiComponent::changeRateText(juce::Label *l)
+void GuiComponent::changeRateText(juce::Label *l, const int type)
 {
+    bool success = true;
     juce::String txt;
     int val = 0;
     
-    jassert(l != nullptr);
+    jassert(l != nullptr && type < 2);
 
     txt = l->getText().toUpperCase();
 
-    if (txt.isEmpty()) return;
-    if (!txt.containsOnly("0123456789ABCDEF") /* || (!textInHex && !txt.contains("0123456789")) */) return;
+    if (txt.isEmpty()) 
+        success = false;
+    else if(textIsHexValue(txt))
+        val = txt.getHexValue32();
+    else if(textIsDecValue(txt))
+        val = txt.getIntValue();
+    else
+        success = false;
 
-    val = textInHex ? txt.getHexValue32() : txt.getIntValue();
+    if (val < 1000 || val >= 1000000) success = false;
 
-    if (val <= 0) return;
-    if (val >= 1000000) return;
+    switch(type)
+    {
+        case 0:
+        
+            if(success) audioProcessor.setSourceSampleRate(currentSample, val);
+            else val = audioProcessor.getSourceSampleRate(currentSample);
+            
+            break;
 
-    audioProcessor.setSourceSampleRate(currentSample, val);
+        case 1:
+        
+            if(success) audioProcessor.setResampleRate(currentSample, val);
+            else val = audioProcessor.getResampleRate(currentSample);
+            
+            break;
+    }
+
+    txt = textInHex ? juce::String::toHexString(val).toUpperCase() : juce::String(val);
     l->setText(txt.paddedLeft('0', 6), juce::NotificationType::dontSendNotification);
 }
 
@@ -555,7 +607,7 @@ void GuiComponent::changeMidiNoteText(juce::Label *l, const int type)
 
     if (txt.isEmpty()) success = false;
 
-    else if (!textInHex && txt.containsOnly("0123456789"))
+    else if (textIsDecValue(txt))
     {
         note = txt.getIntValue();
     }
@@ -601,58 +653,52 @@ void GuiComponent::changeMidiNoteText(juce::Label *l, const int type)
 void GuiComponent::initAllLabels()
 {
     initLabel(&startLoopText,true);
-    startLoopText.setText("000000", juce::NotificationType::dontSendNotification);
+    startLoopText.setText("00000000", juce::NotificationType::dontSendNotification);
     startLoopText.onTextChange = [&] { changeLoopText(&startLoopText, 0); };
 
     initLabel(&endLoopText,true);
-    endLoopText.setText("000000", juce::NotificationType::dontSendNotification);
+    endLoopText.setText("00000000", juce::NotificationType::dontSendNotification);
     endLoopText.onTextChange = [&] { changeLoopText(&endLoopText, 2); };
 
     initLabel(&replenLoopText,true);
-    replenLoopText.setText("000000", juce::NotificationType::dontSendNotification);
+    replenLoopText.setText("00000000", juce::NotificationType::dontSendNotification);
     replenLoopText.onTextChange = [&] { changeLoopText(&replenLoopText, 1); };
 
     initLabel(&sampleRateText,true);
-    sampleRateText.setText("000000", juce::NotificationType::dontSendNotification);
-    sampleRateText.onTextChange = [&] { changeRateText(&sampleRateText); };
+    sampleRateText.setText("00000000", juce::NotificationType::dontSendNotification);
+    sampleRateText.onTextChange = [&] { changeRateText(&sampleRateText, 0); };
     sampleRateText.setVisible(false);
 
     initLabel(&resampleRateText,true);
-    resampleRateText.setText("000000", juce::NotificationType::dontSendNotification);
-    resampleRateText.onTextChange = [&] 
-    { 
-        double val = 0.0;
-        const juce::String txt = resampleRateText.getText().toUpperCase();
-
-        if (txt.isEmpty()) return;
-        if (!txt.containsOnly("0123456789ABCDEF") || (!textInHex && !txt.containsOnly("0123456789"))) return;
-
-        val = textInHex ? txt.getHexValue32() : txt.getIntValue();
-        
-        if(val <= 0) return;
-
-        audioProcessor.setResampleRate(currentSample, val); 
-        resampleRateText.setText(txt.paddedLeft('0', 6), juce::NotificationType::dontSendNotification);
-    };
-
+    resampleRateText.setText("00000000", juce::NotificationType::dontSendNotification);
+    resampleRateText.onTextChange = [&] { changeRateText(&resampleRateText, 1); };
     resampleRateText.setVisible(false);
 
     initLabel(&sampleMidiChannel, false);
     sampleMidiChannel.onTextChange = [&]
     {
-        if (sampleMidiChannel.getText().isEmpty()) return;
+        juce::String chanText = sampleMidiChannel.getText();
+        bool success = true;
+        int channel = -1;
 
-        if(sampleMidiChannel.getText().containsOnly("0123456789"))
-        {
-            const int channel = sampleMidiChannel.getText().getIntValue();
+        if (sampleMidiChannel.getText().isEmpty())
+            success = false;
+        else if(textIsHexValue(chanText))
+            channel = chanText.getHexValue32();
+        else if(textIsDecValue(chanText))
+            channel = chanText.getIntValue();
+        else if(chanText.compareIgnoreCase("ALL") == 0)
+            channel = 0;
+        else
+            success = false;
 
-            if (channel < 0) return;
-            if (channel > 16) return;
+        if (channel < 0 || channel > 16) success = false;
 
-            audioProcessor.setMidiChannel(currentSample, channel);
-        }
-        else if(sampleMidiChannel.getText().compareIgnoreCase("ALL") == 0)
-            audioProcessor.setMidiChannel(currentSample, 0);
+        if(success) audioProcessor.setMidiChannel(currentSample, channel);
+        else channel = audioProcessor.getMidiChannel(currentSample);
+
+        chanText = channel == 0 ? "ALL" : juce::String(channel).paddedLeft('0', 2);
+        sampleMidiChannel.setText(chanText, juce::NotificationType::dontSendNotification);
     };
 
     initLabel(&midiRootNote, false);
@@ -713,20 +759,13 @@ void GuiComponent::initAllCheckboxes()
 
 void GuiComponent::automateLabelText(juce::Label *l, const int value)
 {
-    const juce::String valueText = textInHex ? juce::String::toHexString(value) : juce::String(value);
+    const juce::String valueText = textInHex ? juce::String::toHexString(value).toUpperCase() : juce::String(value);
 
     jassert(l != nullptr);
 
-    if(l->isBeingEdited())
-    {
-        l->getCurrentTextEditor()->setColour(juce::TextEditor::highlightColourId, JPAL(AMI_ORG));
-        l->getCurrentTextEditor()->setJustification(juce::Justification::centred);
-        return;
-    }
-
     if ((textInHex && (l->getText().getHexValue32() == value)) || (!textInHex && (l->getText().getIntValue() == value))) return;
 
-    l->setText(valueText.paddedLeft('0', 6).toUpperCase(), juce::NotificationType::dontSendNotification);
+    l->setText(valueText.paddedLeft('0', 8).toUpperCase(), juce::NotificationType::dontSendNotification);
 }
 
 void GuiComponent::hideMainOptions()
@@ -762,4 +801,14 @@ void GuiComponent::hideMoreOptions()
     
     forwardLoop.setVisible(showExtendedOptions);
     pingpongLoop.setVisible(showExtendedOptions);
+}
+
+bool GuiComponent::textIsHexValue(const juce::String &value)
+{
+    return !textInHex ? false : value.toLowerCase().containsOnly("0123456789abcdef");
+}
+
+bool GuiComponent::textIsDecValue(const juce::String &value)
+{
+    return textInHex ? false : value.containsOnly("0123456789");
 }

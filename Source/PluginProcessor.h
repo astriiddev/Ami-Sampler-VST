@@ -290,6 +290,7 @@ private:
     juce::AudioBuffer<float> waveForm[NUM_SAMPLERS];
 
     std::unique_ptr<juce::FileChooser> myChooser = nullptr;
+    juce::String lastFileDir;
 
     juce::ADSR adsr;
     juce::ADSR::Parameters adsrParams;

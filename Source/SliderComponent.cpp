@@ -55,8 +55,8 @@ void SliderComponent::paint (juce::Graphics& g)
 
 void SliderComponent::resized()
 {
-    masterVolSlider.setBoundsRelative(0.23f, 0.735f, 0.22f, 0.05f);
-    masterPanSlider.setBoundsRelative(0.23f, 0.785f, 0.22f, 0.05f);
+    masterVolSlider.setBoundsRelative(0.24f, 0.735f, 0.21f, 0.05f);
+    masterPanSlider.setBoundsRelative(0.24f, 0.785f, 0.21f, 0.05f);
 
     vibeSpeedSlider.setBoundsRelative(0.51f, 0.735f, 0.19f, 0.05f);
     vibeIntstySlider.setBoundsRelative(0.51f, 0.785f, 0.19f, 0.05f);
